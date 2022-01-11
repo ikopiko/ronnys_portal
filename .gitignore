@@ -1,8 +1,6 @@
 # yii console commands
-/yii
-/yii_test
-/yii_test.bat
 /node_modules
+/dist
 
 
 
