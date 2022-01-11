@@ -3,8 +3,6 @@ import appConfig from "@/app.config";
 
 import { notificationMethods } from "@/state/helpers";
 
-
-
 export default {
   name: "app",
   page: {
