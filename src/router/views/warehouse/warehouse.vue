@@ -45,7 +45,7 @@ export default {
         supplies: [],
         units: [],
         changeSelect: 0,
-        warehouse_id: 2,
+        warehouse_id: 1,
     }
   },
   mounted() {
@@ -110,7 +110,7 @@ export default {
             headers: {
             Authorization: "Bearer " + TOKEN,
             },
-            data: { supplies: this.request, warehouse_id: this.warehouse_id }
+            data: { supplies: this.request.supplies, warehouse_id: this.warehouse_id }
         })
         .then((response) => {
             this.responseData = response;

@@ -2,14 +2,26 @@
 import axios from "axios";
 
 import i18n from "../i18n";
-
+import {  notifications } from "../firebase";
+import simplebar from "simplebar-vue";
 
 /**
  * Nav-bar Component
  */
 export default {
+  firebase: {
+    anArray: notifications,
+    count: [{ id: 12 }],
+  },
   data() {
     return {
+      warehouseId: 0,
+      user_id: null,
+      notificationCount: 0,
+
+      anArray: [],
+      count: null,
+      anObject: null,
       loggedUser: {},
       languages: [
         {
@@ -44,12 +56,35 @@ export default {
       value: null,
     };
   },
-  components: {  },
+  components: {
+    simplebar,
+  },
   mounted() {
     this.value = this.languages.find((x) => x.language === i18n.locale);
     this.text = this.value.title;
     this.flag = this.value.flag;
     this.loggedUser = this.$store.state.authfack.user;
+    this.warehouseId = this.loggedUser.warehouseId;
+    // eslint-disable-next-line no-console
+
+
+
+    this.$watch(
+      "anArray",
+      function () {
+        
+      
+        let t = Object.values(this.anArray);
+        t = t.filter((rqst) => {
+          return rqst.warehouse_id == this.warehouseId;
+        });
+          this.notificationCount = t.length
+
+      // eslint-disable-next-line no-console
+     
+      },
+      { deep: false }
+    );
   },
   methods: {
     toggleMenu() {
@@ -100,6 +135,15 @@ export default {
       });
     },
   },
+  created() {
+    // let t = Object.values(this.anArray);
+    // // eslint-disable-next-line no-console
+    // console.log(this.anArray);
+    // for (let i = 0; i < t.length; i++) {
+    //   if (i == 0) this.notificationCount = 0;
+    //   if (this.user_id == t[i].user_id) this.notificationCount++;
+    // }
+  },
 };
 </script>
 
@@ -120,7 +164,7 @@ export default {
 
           <router-link tag="a" to="/" class="logo logo-light">
             <span class="logo-sm">
-              <img src="@/assets/images/new_ronnys.png" alt height="50" />
+              <img src="@/assets/images/sm_logo.png" alt height="35" />
             </span>
             <span class="logo-lg">
               <img src="@/assets/images/new_ronnys.png" alt height="50" />
@@ -151,21 +195,92 @@ export default {
       </div>
 
       <div class="d-flex">
-
-
-        <b-dropdown right variant="black" toggle-class="header-item" menu-class="dropdown-menu-end">
+        <b-dropdown
+          right
+          menu-class="dropdown-menu-lg p-0 dropdown-menu-end"
+          toggle-class="header-item noti-icon"
+          variant="black"
+        >
           <template v-slot:button-content>
-            <span class="d-none d-xl-inline-block ms-1">{{
+            <i class="bx bx-bell bx-tada"></i>
+            <span class="badge bg-danger rounded-pill">{{
+              notificationCount
+            }}</span>
+          </template>
+
+          <div class="p-3">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="m-0">New Orders</h6>
+              </div>
+              <!-- <div class="col-auto">
+                <a href="#" class="small">{{
+                  $t("navbar.dropdown.notification.subtext")
+                }}</a>
+              </div> -->
+            </div>
+          </div>
+          <simplebar style="max-height: 230px">
+            <li v-for="person of anArray" v-bind:key="person['.key']">
+              <span
+                v-if="person.user_id == user_id"
+                class="text-reset notification-item"
+              >
+                <a
+                  :href="
+                    person.type == 'Project'
+                      ? '/#/projects/overview/' + person.type_id
+                      : '#'
+                  "
+                >
+                  <div class="media">
+                    <div class="media-body">
+                      <h6 class="mt-0 mb-1">
+                        Branch: {{ person.branch }} <br />
+                      </h6>
+                      <div class="font-size-12 text-muted">
+                        <p class="mb-1">order_id {{ person.order_id }}</p>
+                      </div>
+                    </div>
+                    <i
+                      class="mdi mdi-check-all text-success font-size-18"
+                      style="cursor: pointer"
+                      @click="removeNogification(person['.key'])"
+                    ></i>
+                  </div>
+                </a>
+              </span>
+            </li>
+          </simplebar>
+          <!-- <div class="p-2 border-top d-grid">
+            <a
+              class="btn btn-sm btn-link font-size-14 text-center"
+              href="javascript:void(0)"
+            >
+              <i class="mdi mdi-arrow-right-circle me-1"></i>
+              {{ $t("navbar.dropdown.notification.button") }}
+            </a>
+          </div> -->
+        </b-dropdown>
+
+        <b-dropdown
+          right
+          variant="black"
+          toggle-class="header-item"
+          menu-class="dropdown-menu-end"
+        >
+          <template v-slot:button-content>
+            <span class="d-xl-inline-block ms-1">{{
               loggedUser.first_name
             }}</span>
-            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+            <i class="mdi mdi-chevron-down d-xl-inline-block"></i>
           </template>
           <!-- item-->
           <b-dropdown-item>
-              <i class="bx bx-user font-size-16 align-middle me-1"></i>
-              {{ loggedUser.first_name }}
+            <i class="bx bx-user font-size-16 align-middle me-1"></i>
+            {{ loggedUser.first_name }}
           </b-dropdown-item>
-          
+
           <b-dropdown-divider></b-dropdown-divider>
 
           <router-link tag="a" to="/logout" class="dropdown-item text-danger">
@@ -175,8 +290,6 @@ export default {
             {{ $t("navbar.dropdown.henry.list.logout") }}
           </router-link>
         </b-dropdown>
-
-
       </div>
     </div>
   </header>

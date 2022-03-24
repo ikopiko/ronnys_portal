@@ -121,7 +121,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://188.169.16.186:8082/ronny/rest/web/index.php?r=v1/orders/list",
+          "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/orders/list",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },

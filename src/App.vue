@@ -32,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <div id="app">
+  <v-app>
     <RouterView />
-  </div>
+  </v-app>
 </template>

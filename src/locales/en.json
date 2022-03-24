@@ -141,8 +141,14 @@
     "suppliesList": {
       "text": "Supply Request List"
     },
+    "setting": {
+      "text": "Settings"
+    },
+    "ticket": {
+      "text": "Ticket"
+    },
     "request": {
-      "text": "Request Supply"
+      "text": "Manage Requests"
     },
     "warehouse": {
       "text": "Manage Warehouse"

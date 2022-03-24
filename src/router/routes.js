@@ -64,6 +64,24 @@ export default [
     component: () => import('./views/warehouse/manageSupplies')
   },
   {
+    path: '/warehouse/setting',
+    name: 'setting',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/setting')
+  },
+  {
+    path: '/warehouse/ticket',
+    name: 'ticket',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/ticket')
+  },
+  {
+    path: '/warehouse/requests',
+    name: 'requests',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/requests')
+  },
+  {
     path: '/warehouse/warehouse',
     name: 'Warehouses',
     meta: { authRequired: true },

@@ -3,7 +3,8 @@ export const state = {
   layoutWidth: 'fluid',
   leftSidebarType: 'dark',
   topbar: 'dark',
-  loader: false
+  loader: false,
+
 }
 
 export const mutations = {

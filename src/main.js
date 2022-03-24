@@ -5,12 +5,14 @@ import Vuelidate from 'vuelidate'
 import * as VueGoogleMaps from 'vue2-google-maps'
 import VueMask from 'v-mask'
 import VueRouter from 'vue-router'
-import vco from "v-click-outside"
+//import vco from "v-click-outside"
 import router from './router/index'
 import Scrollspy from 'vue2-scrollspy';
 import VueSweetalert2 from 'vue-sweetalert2';
 import vuetify from '@/plugins/vuetify'
 
+
+import { rtdbPlugin as VueFire } from 'vuefire'
 
 import "../src/design/app.scss";
 
@@ -41,9 +43,10 @@ if (process.env.VUE_APP_DEFAULT_AUTH === "firebase") {
 } else {
   configureFakeBackend();
 }
+Vue.use(VueFire)
 Vue.component('tinymce', tinymce)
 Vue.use(VueRouter)
-Vue.use(vco)
+// Vue.use(vco)
 Vue.use(Scrollspy);
 const VueScrollTo = require('vue-scrollto')
 Vue.use(VueScrollTo)

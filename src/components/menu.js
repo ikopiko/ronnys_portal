@@ -46,29 +46,49 @@ export const menuItems = [
         label: "menuitems.warehouse.text",
         isTitle: true
     },
-    {
-        id: 14,
-        label: "menuitems.product.text",
-        icon: "bx-list-plus",
-        link: "/warehouse/products"
-    },
-    {
-        id: 23,
-        label: "menuitems.supplies.text",
-        icon: "bx-bar-chart-alt-2",
-        link: "/warehouse/supplies"
-    },
+    // {
+    //     id: 14,
+    //     label: "menuitems.product.text",
+    //     icon: "bx-list-plus",
+    //     link: "/warehouse/products"
+    // },
+    // {
+    //     id: 23,
+    //     label: "menuitems.supplies.text",
+    //     icon: "bx-bar-chart-alt-2",
+    //     link: "/warehouse/supplies"
+    // },
+    // {
+    //     id: 24,
+    //     label: "menuitems.warehouse.text",
+    //     icon: "bx-building-house",
+    //     link: "/warehouse/warehouse"
+    // },
+    // {
+    //     id: 25,
+    //     label: "menuitems.suppliesList.text",
+    //     icon: "bx-building-house",
+    //     link: "/warehouse/suppliesList"
+    // },
     {
         id: 24,
-        label: "menuitems.warehouse.text",
-        icon: "bx-building-house",
-        link: "/warehouse/warehouse"
+        label: "menuitems.request.text",
+        icon: "bx-list-plus",
+        link: "/warehouse/requests"
     },
     {
-        id: 25,
-        label: "menuitems.suppliesList.text",
-        icon: "bx-building-house",
-        link: "/warehouse/suppliesList"
+        id: 27,
+        label: "menuitems.ticket.text",
+        icon: "bx-info-circle",
+        link: "/warehouse/ticket"
     },
+    {
+        id: 26,
+        label: "menuitems.setting.text",
+        icon: "bx-cog",
+        link: "/warehouse/setting"
+    },
+
+
 ];
 

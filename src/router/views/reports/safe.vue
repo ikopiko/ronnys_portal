@@ -181,7 +181,7 @@ export default {
         this.branchURL = 'http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/';
       } 
       else if(branch == 'digomi'){
-        this.branchURL = 'http://188.169.16.186:8082/ronny/rest/web/index.php?r=v1/';
+        this.branchURL = 'http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/';
       } 
       else if(branch == 'gldani'){
         this.branchURL = 'http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/';
