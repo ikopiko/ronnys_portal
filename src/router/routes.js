@@ -16,6 +16,12 @@ export default [
     component: () => import('./views/reports/discounts')
   },
   {
+    path: '/reports/sales-report',
+    name: 'SalesReport',
+    meta: { authRequired: true },
+    component: () => import('./views/reports/salesReport')
+  },  
+  {
     path: '/reports/orders',
     name: 'Orders',
     meta: { authRequired: true },

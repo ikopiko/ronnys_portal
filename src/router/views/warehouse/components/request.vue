@@ -10,7 +10,7 @@ export default {
 
   data() {
     return {
-      sendProductLis: [{ name: "asdasd", unit: "KG", qnty: 12 }],
+      sendProductLis: [],
       snackbar: false,
       color: "default",
       snackbarText: null,

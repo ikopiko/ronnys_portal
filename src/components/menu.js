@@ -24,6 +24,12 @@ export const menuItems = [
         link: "/reports/banks"
     },
     {
+        id: 10,
+        label: "Sales report",
+        icon: "bxs-bank",
+        link: "/reports/sales-report"
+    },
+    {
         id: 11,
         label: "menuitems.safe.text",
         icon: "bx-wallet-alt",
