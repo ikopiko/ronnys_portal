@@ -5,9 +5,7 @@ import DatePicker from "vue2-datepicker";
 import excel from "vue-excel-export";
 import Vue from "vue";
 import moment from "moment";
-
 Vue.use(excel);
-
 export default {
   page: {
     title: "Sales Report",
@@ -17,7 +15,6 @@ export default {
     DatePicker,
   },
   computed: {},
-
   data() {
     return {
       date: [
@@ -25,7 +22,6 @@ export default {
         moment(new Date()).format("YYYY-MM-DD"),
       ],
       branch: null,
-
       validSearch: true,
       loader: false,
       json_fields: {
@@ -41,7 +37,6 @@ export default {
       snackbarText: null,
       TOKEN: null,
       selectedBranch: null,
-
       branchOptions: [
         { value: "saburtalo", text: "Saburtalo" },
         { value: "vake", text: "Vake" },
@@ -59,11 +54,9 @@ export default {
         { text: "Category name", align: "start", value: "category_name" },
         
       ],
-
       nameRules: [(v) => !!v || " required"],
     };
   },
-
   mounted() {
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
@@ -73,9 +66,7 @@ export default {
     getReport() {
       if (this.$refs.searchForm.validate()) {
         this.loader = true;
-
         this.json_data = this.supplyList = [];
-
         if (this.branch == "saburtalo") {
           this.branchURL =
             "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";
@@ -89,7 +80,6 @@ export default {
           this.branchURL =
             "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";
         }
-
         axios
           .request({
             method: "post",

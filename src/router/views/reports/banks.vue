@@ -1,14 +1,28 @@
+<style>
+ @import "../../../../node_modules/@syncfusion/ej2-vue-grids/styles/material.css";
+
+ .disablegrid {
+        /* pointer-events: none;
+        opacity: 0.4; */
+        display: none;
+    }
+    .wrapper {
+        cursor: not-allowed;
+    }
+</style>
 <script>
 import axios from 'axios'
-import excel from 'vue-excel-export'
+// import excel from 'vue-excel-export'
 import Layout from '../../layouts/main'
 import PageHeader from '@/components/page-header'
+
+import { GridPlugin, Toolbar, ExcelExport } from "@syncfusion/ej2-vue-grids";
 
 
 import appConfig from "@/app.config";
 import Vue from 'vue'
 
-Vue.use(excel);
+Vue.use(GridPlugin);
 
 /**
  * Products-order component
@@ -27,6 +41,8 @@ export default {
   },
   data() {
     return {
+      excelTitle: "Ronny's",
+      toolbarOptions: ['ExcelExport'],
       fromDate: String(new Date()),
       // toDate: String(new Date()),
       currentPage: 1,
@@ -141,7 +157,47 @@ export default {
         this.orderStatuses = response.data.data
       });
   },
+  //   EXCEL EXPORT CODE
+  provide: {
+    grid: [Toolbar, ExcelExport]
+  },
+  //   END OF EXCEL EXPORT CODE
   methods: {
+    // EXCEL EXPORT METHODS
+     btnClick() {
+      if (this.$refs.Grid.$el.classList.contains('disablegrid')) {
+          // this.$refs.Grid.$el.classList.remove('disablegrid');
+          // document.getElementById("GridParent").classList.remove('wrapper');
+      }
+      else {
+          this.$refs.Grid.$el.classList.add('disablegrid');
+          document.getElementById("GridParent").classList.add('wrapper');
+      }
+    },
+      toolbarClick: function() {
+        //  if (args.item.id === 'Grid_excelexport') { // 'Grid_excelexport' -> Grid component id + _ + toolbar item name
+            let excelExportProperties = {
+                header: {
+                    headerRows: 7,
+                    rows: [
+                        { cells: [{ colSpan: 4, value: this.excelTitle, style: { fontColor: '#000000', fontSize: 32, hAlign: 'Center', bold: true, } }] },
+                        { cells: [{ colSpan: 4, value: "Branch: " + this.selectedBranch, style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
+                        { cells: [{ colSpan: 4, value: "Banks", style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
+                        { cells: [{ colSpan: 4, value: "Date: " + this.fromDate + " - " + this.toDate, style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
+                    ]
+                },
+                footer: {
+                    footerRows: 4,
+                    rows: [
+                        { cells: [{ colSpan: 4, value: "Ronny's", style: { hAlign: 'Center', bold: true } }] },
+                        // { cells: [{ colSpan: 4, value: "!Visit Again!", style: { hAlign: 'Center', bold: true } }] }
+                    ]
+                }
+            };
+            this.$refs.Grid.excelExport(excelExportProperties);
+        // }
+    },
+    // END OF EXCEL EXPORT METHODS
     info(item, index, button) {
         this.infoModal.title = `Row index: ${index}`
         this.infoModal.order_id = item.id;
@@ -175,16 +231,16 @@ export default {
     },
     changeBranch(branch){
       if(branch == 'saburtalo'){
-        this.branchURL = 'http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/';
+        this.branchURL =  this.$hostSaburtalo;
       } 
       else if(branch == 'vake'){
-        this.branchURL = 'http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/';
+        this.branchURL =  this.$hostVake;
       } 
       else if(branch == 'digomi'){
-        this.branchURL = 'http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/';
+        this.branchURL =  this.$hostDigomi;
       } 
       else if(branch == 'gldani'){
-        this.branchURL = 'http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/';
+        this.branchURL =  this.$hostGldani;
       } 
     },
     updateList(){
@@ -342,20 +398,51 @@ export default {
                     </div>
                 </div>
                   <div class="col-sm-4 mt-4">
-                    <b-button variant="success" @click="updateList()">
+                    <b-button variant="success" @click="updateList(), btnClick()">
                       <i
                         class="bx bx-check-double font-size-16 align-middle me-2"
                       ></i>
                       Search
                     </b-button>
+                    <!-- EXCEL EXPORT CODE -->
                     <b-button variant="primary" class="mx-2" v-if="exportData.length != 0">
-                    <export-excel
-                        :data  = "exportData"
-                        :name = "'banks.xls'">
-                        Export data to Excel
-                        <i class="bx bx-download"></i>
-                    </export-excel>
+                    
+                    <div id="app">
+                      <!-- <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="btnClick">Enable/Disable Grid</ejs-button> -->
+                      <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="toolbarClick">Excel Export</ejs-button>
+                      <ejs-grid ref='Grid' id='Grid' :dataSource='exportData'  :toolbar='toolbarOptions' height='270px' :allowPaging='true' :allowExcelExport='true' :toolbarClick='toolbarClick'>
+                          <e-columns>
+                              <e-column field="id" headerText="ID" ></e-column>
+                              <e-column field="name" headerText="Name"></e-column>
+                              <e-column field="amount" headerText="Amount" ></e-column>
+                              <e-column field="pos_id" headerText="POS ID"></e-column>
+                              <e-column field="user_id" headerText="User ID"></e-column>
+                              <e-column field="created_at" headerText="Date"></e-column>
+                          </e-columns>
+                      </ejs-grid>
+                  </div>
+
                     </b-button>
+
+                    <b-button variant="primary" class="mx-2 hidden disablegrid" v-if="exportData.length == 0">
+                    
+                    <div id="app">
+                      <!-- <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="btnClick">Enable/Disable Grid</ejs-button> -->
+                      <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="toolbarClick">Excel Export</ejs-button>
+                      <ejs-grid ref='Grid' id='Grid' :dataSource='exportData'  :toolbar='toolbarOptions' height='270px' :allowPaging='true' :allowExcelExport='true' :toolbarClick='toolbarClick'>
+                          <e-columns>
+                              <e-column field="id" headerText="Order ID" ></e-column>
+                              <e-column field="name" headerText="Customer Name"></e-column>
+                              <e-column field="totalDue" headerText="Total Due"></e-column>
+                              <e-column field="id" headerText="Order ID" ></e-column>
+                              <e-column field="name" headerText="Customer Name"></e-column>
+                              <e-column field="totalDue" headerText="Total Due"></e-column>
+                          </e-columns>
+                      </ejs-grid>
+                  </div>
+
+                    </b-button>
+                    <!-- END OF EXCEL EXPORT CODE -->
                   </div>
                 <!-- end col-->
               </div>

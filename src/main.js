@@ -56,6 +56,15 @@ Vue.prototype.$hostname = "https://api.ronnys.info/rest/web/index.php?r=v1/";  /
 
 Vue.prototype.$authHostName = "https://api.ronnys.info/rest/web/index.php?r=auth";  // TEST
 
+Vue.prototype.$hostSaburtalo = "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";  // SABURTALO
+
+Vue.prototype.$hostVake = "http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/";  // VAKE
+
+Vue.prototype.$hostDigomi = "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/";  // DIGOMI
+
+Vue.prototype.$hostGldani = "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";  // GLDANI
+
+
 Vue.use(BootstrapVue)
 Vue.use(Vuelidate)
 Vue.use(VueMask)
