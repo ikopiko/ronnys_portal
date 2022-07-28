@@ -150,6 +150,9 @@
     "request": {
       "text": "Manage Requests"
     },
+    "waybill": {
+      "text": "Waybill"
+    },
     "warehouse": {
       "text": "Manage Warehouse"
     },

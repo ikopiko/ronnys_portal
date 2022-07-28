@@ -22,6 +22,12 @@ export default [
     component: () => import('./views/reports/salesReport')
   },  
   {
+    path: '/reports/toppings-report',
+    name: 'SalesReport',
+    meta: { authRequired: true },
+    component: () => import('./views/reports/toppingsReport')
+  },  
+  {
     path: '/reports/orders',
     name: 'Orders',
     meta: { authRequired: true },
@@ -86,6 +92,18 @@ export default [
     name: 'requests',
     meta: { authRequired: true },
     component: () => import('./views/warehouse/requests')
+  },
+  {
+    path: '/warehouse/waybill',
+    name: 'waybill',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/waybill')
+  },
+  {
+    path: '/warehouse/pay',
+    name: 'pay',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/pay')
   },
   {
     path: '/warehouse/warehouse',

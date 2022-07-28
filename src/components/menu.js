@@ -24,10 +24,16 @@ export const menuItems = [
         link: "/reports/banks"
     },
     {
-        id: 10,
+        id: 217,
         label: "Sales report",
-        icon: "bxs-bank",
+        icon: "bxs-purchase-tag-alt",
         link: "/reports/sales-report"
+    },
+    {
+        id: 28,
+        label: "Toppings report",
+        icon: "bxs-circle",
+        link: "/reports/toppings-report"
     },
     {
         id: 11,
@@ -77,6 +83,12 @@ export const menuItems = [
     //     link: "/warehouse/suppliesList"
     // },
     {
+        id: 29,
+        label: "menuitems.waybill.text",
+        icon: "bx-list-plus",
+        link: "/warehouse/waybill"
+    },
+    {
         id: 24,
         label: "menuitems.request.text",
         icon: "bx-list-plus",
@@ -93,6 +105,12 @@ export const menuItems = [
         label: "menuitems.setting.text",
         icon: "bx-cog",
         link: "/warehouse/setting"
+    },
+    {
+        id: 11111,
+        label: "menuitems.setting.pay",
+        icon: "bx-cog",
+        link: "/warehouse/pay"
     },
 
 
