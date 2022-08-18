@@ -259,6 +259,8 @@ export default {
       } 
     },
     updateList(){
+      // eslint-disable-next-line no-console
+
       var date
       if(this.toDate == null) {
         date = this.fromDate + " to " + this.fromDate
@@ -276,12 +278,13 @@ export default {
       var bodyUpdate = new FormData();
       bodyUpdate.set("day", date);
       bodyUpdate.set("status_key", this.status);
+      bodyUpdate.set("branch",this.selectedBranch)
 
       axios
         .request({
           method: "post",
           url:
-            this.branchURL + "orders/list",
+            "http://new.ronnys.info/?r=v1/orders/list-reporting",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },
