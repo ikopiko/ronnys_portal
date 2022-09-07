@@ -205,12 +205,13 @@ export default {
 
       var bodyUpdate = new FormData();
       bodyUpdate.set("day", date);
+      bodyUpdate.set("branch",this.selectedBranch)
 
       axios
         .request({
           method: "post",
           url:
-            this.branchURL + "manager/discounted-orders",
+            "http://new.ronnys.info/?r=v1/manager/discounted-orders",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },
