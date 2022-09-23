@@ -326,7 +326,7 @@ export default {
             excelObject.amount = x.order_data.discPrice;
             excelObject.totalDue = x.order_data.totalDue;
             excelObject.comment = x.order_data.managerComment;
-            excelObject.payment = x.order_data.paymentType;
+            excelObject.payment = x.order_data.paymentType+"  "+(x.opay_status != null ?x.opay_status:"");
             excelObject.woltCode = x.order_data.customer.code;
             excelObject.status = x.statusName;
             excelObject.date = x.finish_date;
