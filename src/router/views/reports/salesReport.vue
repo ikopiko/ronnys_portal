@@ -67,28 +67,18 @@ export default {
       if (this.$refs.searchForm.validate()) {
         this.loader = true;
         this.json_data = this.supplyList = [];
-        if (this.branch == "saburtalo") {
-          this.branchURL =
-            "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "vake") {
-          this.branchURL =
-            "http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "digomi") {
-          this.branchURL =
-            "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "gldani") {
-          this.branchURL =
-            "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";
-        }
+
+        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/sales-report"
         axios
           .request({
             method: "post",
-            url: this.branchURL + "reporting/sales-report",
+            url: this.branchURL + "",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },
             data: {
               date: this.date,
+              branch: this.branch
             },
           })
           .then((response) => {
@@ -127,7 +117,7 @@ export default {
               v-model="branch"
               :items="branchOptions"
               dense
-              :rules="nameRules"
+            
               label="Select branch"
             ></v-autocomplete>
           </v-col>

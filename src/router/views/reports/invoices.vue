@@ -114,7 +114,7 @@ export default {
       exportData: [],
       branchOptions: [
         { value: null, text: 'Select Branch'},
-        { value: 'saburtalo', text: 'Saburtalo'},
+  { value: 'saburtalo', text: 'Saburtalo'},
         { value: 'vake', text: 'Vake'},
         { value: 'digomi', text: 'Digomi'},
         { value: 'gldani', text: 'Gldani'},
@@ -162,7 +162,7 @@ export default {
       .request({
         method: "post",
         url:
-          this.$hostname + "poses/order-statuses",
+          "http://new.ronnys.info/?r=v1/poses/order-statuses",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -279,12 +279,14 @@ export default {
       var bodyUpdate = new FormData();
       bodyUpdate.set("day", date);
       bodyUpdate.set("status_key", this.status);
+       bodyUpdate.set("branch",this.selectedBranch)
+
 
       axios
         .request({
           method: "post",
           url:
-            this.branchURL + "orders/list",
+            "http://new.ronnys.info/?r=v1/orders/list-reporting",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },

@@ -109,10 +109,10 @@ export default {
       exportData: [],
       branchOptions: [
         { value: null, text: 'Select Branch'},
-        { value: 'saburtalo', text: 'Saburtalo'},
-        { value: 'vake', text: 'Vake'},
-        { value: 'digomi', text: 'Digomi'},
-        { value: 'gldani', text: 'Gldani'},
+        { value: '2', text: 'Saburtalo'},
+        { value: '3', text: 'Vake'},
+        { value: '1', text: 'Digomi'},
+        { value: '4', text: 'Gldani'},
       ],
       loggedUser: {},
       ordersList: [],
@@ -262,12 +262,13 @@ export default {
         
       var bodyUpdate = new FormData();
       bodyUpdate.set("day", date);
+      bodyUpdate.set("branch_id", this.selectedBranch);
 
       axios
         .request({
           method: "post",
           url:
-            this.branchURL + "manager/get-close-day",
+            "http://new.ronnys.info/?r=v1/reporting/get-close-day",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },

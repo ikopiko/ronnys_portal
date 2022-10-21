@@ -59,19 +59,20 @@ export default {
     const TOKEN = this.loggedUser.token;
 
     var day = this.date + ' to ' + this.date;
-    var bodyUpdate = new FormData();
-    bodyUpdate.set("day", day);
-    bodyUpdate.set("status_key", this.status);
+    var bodyUpdateSaburtalo = new FormData();
+    bodyUpdateSaburtalo.set("day", day);
+    bodyUpdateSaburtalo.set("status_key", this.status);
+    bodyUpdateSaburtalo.set("branch", "saburtalo");
 
     axios
       .request({
         method: "post",
         url:
-          "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/orders/list",
+          "http://new.ronnys.info/?r=v1/orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
-        data: bodyUpdate,
+        data: bodyUpdateSaburtalo,
       })
       .then((response) => {
         this.ordersList = response.data.data;
@@ -89,16 +90,20 @@ export default {
         };
         this.branchInfo.push(saburtalo);
       });
-
+ 
+     var bodyUpdateVake = new FormData();
+    bodyUpdateVake.set("day", day);
+    bodyUpdateVake.set("status_key", this.status);
+    bodyUpdateVake.set("branch", "vake");
     axios
       .request({
         method: "post",
         url:
-          "http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/orders/list",
+          "http://new.ronnys.info/?r=v1/orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
-        data: bodyUpdate,
+        data: bodyUpdateVake,
       })
       .then((response) => {
         this.ordersList = response.data.data;
@@ -116,16 +121,19 @@ export default {
         };
         this.branchInfo.push(saburtalo);
       });
-
+     var bodyUpdateDigomi = new FormData();
+    bodyUpdateDigomi.set("day", day);
+    bodyUpdateDigomi.set("status_key", this.status);
+    bodyUpdateDigomi.set("branch", "digomi");
     axios
       .request({
         method: "post",
         url:
-          "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/orders/list",
+          "http://new.ronnys.info/?r=v1/orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
-        data: bodyUpdate,
+        data: bodyUpdateDigomi,
       })
       .then((response) => {
         this.ordersList = response.data.data;
@@ -143,16 +151,19 @@ export default {
         };
         this.branchInfo.push(saburtalo);
       });
-
+    var bodyUpdateGldani = new FormData();
+    bodyUpdateGldani.set("day", day);
+    bodyUpdateGldani.set("status_key", this.status);
+    bodyUpdateGldani.set("branch", "gldani");
     axios
       .request({
         method: "post",
         url:
-          "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/orders/list",
+          "http://new.ronnys.info/?r=v1/orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
-        data: bodyUpdate,
+        data: bodyUpdateGldani,
       })
       .then((response) => {
         this.ordersList = response.data.data;
