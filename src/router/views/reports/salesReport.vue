@@ -61,6 +61,7 @@ export default {
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
+    this.getReport()
   },
   methods: {
     getReport() {
