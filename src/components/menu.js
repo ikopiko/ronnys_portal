@@ -23,38 +23,39 @@ export const menuItems = [
         icon: "bxs-bank",
         link: "/reports/banks"
     },
+
     {
-        id: 217,
+        id: 11,
         label: "Sales report",
         icon: "bxs-purchase-tag-alt",
         link: "/reports/sales-report"
     },
     {
-        id: 28,
+        id: 12,
         label: "Toppings report",
         icon: "bxs-circle",
         link: "/reports/toppings-report"
     },
     {
-        id: 11,
+        id: 13,
         label: "menuitems.safe.text",
         icon: "bx-wallet-alt",
         link: "/reports/safe"
     },
     {
-        id: 12,
+        id: 14,
         label: "menuitems.closed.text",
         icon: "bx-window-close",
         link: "/reports/closed"
     },
     {
-        id: 22,
+        id: 25,
         label: "menuitems.invoice.text",
         icon: "bx-file",
         link: "/reports/invoices"
     },
     {
-        id: 13,
+        id: 16,
         label: "menuitems.warehouse.text",
         isTitle: true
     },
@@ -83,35 +84,35 @@ export const menuItems = [
     //     link: "/warehouse/suppliesList"
     // },
     {
-        id: 29,
+        id: 17,
         label: "menuitems.waybill.text",
         icon: "bx-list-plus",
         link: "/warehouse/waybill"
     },
     {
-        id: 24,
+        id: 18,
         label: "menuitems.request.text",
         icon: "bx-list-plus",
         link: "/warehouse/requests"
     },
     {
-        id: 27,
+        id: 19,
         label: "menuitems.ticket.text",
         icon: "bx-info-circle",
         link: "/warehouse/ticket"
     },
     {
-        id: 26,
+        id: 20,
         label: "menuitems.setting.text",
         icon: "bx-cog",
         link: "/warehouse/setting"
     },
-    {
-        id: 11111,
-        label: "menuitems.setting.pay",
-        icon: "bx-cog",
-        link: "/warehouse/pay"
-    },
+    // {
+    //     id: 11111,
+    //     label: "menuitems.setting.pay",
+    //     icon: "bx-cog",
+    //     link: "/warehouse/pay"
+    // },
 
 
 ];

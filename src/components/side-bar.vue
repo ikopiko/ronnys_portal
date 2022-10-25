@@ -45,7 +45,9 @@ export default {
       }, 300);
     },
   },
-  mounted() {},
+  mounted() {
+    
+  },
   watch: {
     $route: {
       handler: "onRoutechange",
