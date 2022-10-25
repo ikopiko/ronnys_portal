@@ -18,8 +18,8 @@ const firebaseConfig = {
   export const db = app.database()
 
    let requests = db.ref('requests')  
-   let notificatons = db.ref('notification')  
-   let ordersNotification = db.ref('orders')  
+   let notificatons = db.ref('orders')  
+   let ordersNotification = db.ref('notification')  
 
    export const notifications = requests
    export const newRequest = notificatons

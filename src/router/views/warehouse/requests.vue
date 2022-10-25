@@ -26,8 +26,11 @@ export default {
 
   watch: {
     newRequestList: function () {
-      var newRequestListArray = Object.values(this.newRequestList);
+            var newRequestListArray = Object.values(this.newRequestList);
+      // eslint-disable-next-line no-console
+         console.log(newRequestListArray[0]["gldani"]);
       var t = newRequestListArray.filter((rqst) => {
+        
         return (
           rqst.warehouse_id == this.warehouseId &&
           rqst.function == "receiveRequest"
@@ -91,7 +94,7 @@ export default {
       recieveProductSearch: "",
       requestHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "quantity", value: "quanunit" },
+        { text: "quantity", value: "sum" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "to_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
@@ -296,6 +299,7 @@ export default {
               product_id: this.supplyId,
               warehouse_id: this.warehouseId,
               quantity: this.supplyQty,
+              minQuantity:this.supplyMinQty
             },
           })
           .then((response) => {
@@ -860,12 +864,13 @@ export default {
                   :rules="[(v) => !!v || 'Quantity is required']"
                   label="Quantity"
                   required
-                  :suffix="supplyMinQty"
+               
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
                 <v-text-field
                   dense
+                  v-model="supplyMinQty"
                   :rules="[(v) => !!v || 'Minimum Quantity is required']"
                   label="Minimum amount"
                   required

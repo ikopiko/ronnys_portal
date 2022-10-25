@@ -20,6 +20,7 @@ export default {
   computed: {},
   data() {
     return {
+      loader:false,
       waybillModal:false,
       showAcceptRecieveProductsBtn: false,
       seletedwaybill: null,
@@ -87,6 +88,7 @@ export default {
     },
 
     getwaybillList() {
+      this.loader = true
       var bodyFormData = new FormData();
       bodyFormData.set("warehouse_id", this.warehouseId);
       axios
@@ -99,6 +101,7 @@ export default {
           data: bodyFormData,
         })
         .then((response) => {
+          this.loader = false
            this.waybillList = response.data
           // this.waybillList = response.data.filter((rqst) => {
           //   return rqst.status == 1;
@@ -128,6 +131,7 @@ export default {
           <v-spacer></v-spacer>
         </v-card-title>
         <v-data-table
+         :loading="loader"
           dense
           show-select
           :headers="waybillHeaders"

@@ -203,14 +203,11 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    
-    <div class="col-xl-8">
+     
       <div class="row">
-        <div v-for="stat of branchInfo" :key="stat.name" class="col-md-4">
+        <div v-for="stat of branchInfo" :key="stat.name" class="col-3">
           <Stat :icon="stat.icon" :name="stat.name" :orders="stat.orders" :sum="stat.sum" />
         </div>
       </div>
-    </div>
-
   </Layout>
 </template>
