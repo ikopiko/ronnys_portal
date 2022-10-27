@@ -11,6 +11,8 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^22.0.0",
     "@ckeditor/ckeditor5-vue": "^1.0.3",
+    "@firebase/storage": "^0.9.12",
+    "firebase": "^8.2.9",
     "@fullcalendar/bootstrap": "^5.3.1",
     "@fullcalendar/core": "^5.3.1",
     "@fullcalendar/daygrid": "^5.3.1",
@@ -29,7 +31,6 @@
     "core-js": "^3.7.0",
     "echarts": "^4.9.0",
     "eslint-loader": "^4.0.2",
-    "firebase": "^8.10.1",
     "leaflet": "^1.7.1",
     "metismenujs": "^1.2.1",
     "sass": "^1.30.0",

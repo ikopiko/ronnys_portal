@@ -15,7 +15,7 @@ export default {
       color: "default",
       snackbarText: null,
       request: [],
-      productValues: "",
+      productValues: [],
       branchValue: "",
       branchList: [],
       productList: [],
@@ -51,6 +51,11 @@ export default {
       });
   },
   methods: {
+    closeModal(){
+      this.productValues = [];
+      this.branchValue = "";
+      this.$emit('closeModal');
+    },
     test() {
       this.productValues.forEach((x) => {
         var req = {
@@ -69,11 +74,11 @@ export default {
           data: { supplies: this.request, warehouse_id: this.branchValue },
         })
         .then((response) => {
-          this.method();
           this.color = "success";
           this.snackbarText = response.data.data;
           this.snackbar = true;
           this.responseData = response;
+          this.closeModal();
         });
     },
   },
@@ -93,7 +98,7 @@ export default {
         <span class="text-h6"> Send request</span>
         <v-spacer></v-spacer>
         <v-card-actions class="justify-end">
-          <v-btn @click="supplyModal = false" icon small color="gray">
+          <v-btn @click="closeModal" icon small color="gray">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-actions>
@@ -122,7 +127,7 @@ export default {
               <v-autocomplete
                 v-model="branchValue"
                 :items="branchList"
-                 label="Choose warehouse"
+                label="Choose warehouse"
                 item-text="name"
                 item-value="id"
                 clearable
@@ -167,6 +172,7 @@ export default {
           elevation="0"
           color="red"
           small
+          @click="closeModal"
           class="white--text text-capitalize"
         >
           <i class="bx bx-x-circle"></i> Cancel

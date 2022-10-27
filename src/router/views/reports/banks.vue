@@ -165,7 +165,7 @@ export default {
               clearable
               v-model="branch"
               :items="branchOptions"
-              @change="(event) => updateRegion(event, index)"
+              @change="(event) => updateRegion(event)"
               dense
               label="Select branch"
             ></v-autocomplete>

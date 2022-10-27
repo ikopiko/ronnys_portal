@@ -59,7 +59,7 @@ export default {
   data() {
     return {
       showAcceptRecieveProductsBtn:false,
-      seletedReceiveProductsItems: null,
+      seletedReceiveProductsItems: [],
       showRecieveProductsModal:false,
       newRequestList: [],
       sentProductsList: [],
@@ -115,7 +115,15 @@ export default {
         { text: "Requested Qty", value: "quantity" },
         { text: "Sent Qty", value: "sent_quantity" },
         { text: "status", value: "status" },
-        { text: "Warehouse", value: "to_warehouse_name" },
+        { text: "Warehouse", value: "from_warehouse_name" },
+        { text: "Actions", value: "actions", align: "end", sortable: false },
+      ],
+      sendProductsHeaders: [
+        { text: "Name", align: "start", value: "product_name" },
+        { text: "Requested Qty", value: "quantity" },
+        { text: "Sent Qty", value: "sent_quantity" },
+        { text: "status", value: "status" },
+        { text: "Warehouse", value: "from_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       productList: [],
@@ -134,6 +142,40 @@ export default {
     this.receiveRequests();
   },
   methods: {
+    closeSendProducttModal(){
+      this.sentRequests();
+      this.getSupplyList();
+      this.productslist();
+      this.receiveRequests();
+      
+      this.seletedSentProducts = [];
+      this.editSentProductsModal = false;
+    },
+    closeRecieveProductsModal(){
+      this.sentRequests();
+      this.getSupplyList();
+      this.productslist();
+      this.receiveRequests();
+      this.seletedReceiveProductsItems = [];
+      this.showRecieveProductsModal = false;
+    },
+    closeAcceptRequestModal() {
+      this.sentRequests();
+      this.getSupplyList();
+      this.productslist();
+      this.receiveRequests();
+      this.showAcceptListModal = false;
+      this.seletedReceiveItems = [];
+    },
+    closeSendRequestModal() {
+      this.sentRequests();
+      this.getSupplyList();
+      this.productslist();
+      this.receiveRequests();
+      // closeSendRequestModal
+      this.seletedSentProducts = [];
+      this.sendRequestModal = false;
+    },
     rejectRequestSingle(id) {
       axios
         .request({
@@ -152,6 +194,7 @@ export default {
           this.snackbar = true;
           this.sentRequests();
           this.receiveRequests();
+          this.showRecieveProductsModal = false;
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
@@ -197,10 +240,15 @@ export default {
     },
     acceptRecieveProductsSingle(item){
       this.seletedReceiveProductsItems = [item]
-       this.showRecieveProductsModal = true;
+      this.showRecieveProductsModal = true;
+    },
+    acceptSentProductsSingle(item){
+      this.seletedReceiveProductsItems = [item]
+      this.showRecieveProductsModal = true;
     },
     acceptRecieveProducts(){
         var k = [];
+        alert('BLA');
       this.seletedReceiveProductsItems.forEach(function (item) {
         // eslint-disable-next-line no-console
         k.push({ id: item.id, quantity: item.quantity });
@@ -220,10 +268,14 @@ export default {
           this.color = "success";
           this.snackbarText = response.data;
           this.snackbar = true;
+          this.showRecieveProductsModal = false;
+          this.closeRecieveProductsModal();
           this.getSupplyList();
           this.receiveRequests();
           this.sentRequests();
+  
         });
+          
 
     },
     acceptRequest() {
@@ -246,8 +298,10 @@ export default {
         })
         .then((response) => {
           this.color = "success";
-          this.snackbarText = response.data;
+          this.snackbarText = response.data.data;
           this.snackbar = true;
+          this.showAcceptListModal = false;
+          this.seletedReceiveItems = [];
           this.getSupplyList();
         });
     },
@@ -276,9 +330,11 @@ export default {
           this.getSupplyList();
           this.receiveRequests();
           this.sentRequests();
+          this.closeSendProducttModal();
         });
     },
     editSentProductSingle(item) {
+      
       this.seletedSentProducts = [item];
       this.editSentProductsModal = true;
     },
@@ -405,7 +461,7 @@ export default {
 <template>
   <Layout>
     <v-dialog v-model="sendRequestModal" max-width="1100">
-      <requesModal :token="TOKEN" :method="asd" />
+      <requesModal :token="this.TOKEN" :method="asd" @closeModal="closeSendRequestModal" />
     </v-dialog>
 
     <v-card elevation="1" class="bg-primary">
@@ -465,18 +521,6 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="orange">
-                          <v-icon small class="mr-2" @click="editItem(item)">
-                            mdi-pencil
-                          </v-icon>
-                        </v-btn>
-                      </span>
-                    </template>
-                    <span>Edit supply</span>
-                  </v-tooltip>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small class="ma-2" color="green">
                           <v-icon small @click="deleteProduct(item)">
                             mdi-eye
@@ -484,7 +528,7 @@ export default {
                         </v-btn>
                       </span>
                     </template>
-                    <span>Hide supply</span>
+                    <span>View History</span>
                   </v-tooltip>
                 </template>
               </v-data-table>
@@ -642,14 +686,17 @@ export default {
                   hide-details
                 ></v-text-field>
                 <v-spacer></v-spacer>
-                <b-button
+
+                <!-- RECEIVED MODAL BUTTON -->
+                
+                <!-- <b-button
                   size="sm"
                   variant="primary"
                   @click="showProductModal = true"
                 >
                   <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                   Received Request
-                </b-button>
+                </b-button> -->
               </v-card-title>
               <v-data-table
                 dense
@@ -748,7 +795,7 @@ export default {
               <v-data-table
                 dense
                 show-select
-                :headers="receiveRequestHeaders"
+                :headers="sendProductsHeaders"
                 :items="sentProductsList"
                 :items-per-page="10"
                 :search="sentProductsSearch"
@@ -963,7 +1010,7 @@ export default {
             color="red"
             small
             class="white--text text-capitalize"
-            @click="showAcceptListModal = false"
+            @click="closeAcceptRequestModal"
           >
             <i class="bx bx-x"></i> No
           </v-btn>
@@ -978,7 +1025,7 @@ export default {
           <v-spacer></v-spacer>
           <v-card-actions class="justify-end">
             <v-btn
-              @click="showRecieveProductsModal = false"
+              @click="closeRecieveProductsModal()"
               icon
               small
               color="gray"
@@ -1018,7 +1065,7 @@ export default {
           <v-btn
             color="success me-2"
             elevation="0"
-            @click="acceptRecieveProducts"
+            @click="acceptRecieveProducts()"
             small
             class="white--text text-capitalize"
           >
@@ -1030,7 +1077,7 @@ export default {
             color="red"
             small
             class="white--text text-capitalize"
-            @click="showRecieveProductsModal = false"
+            @click="closeRecieveProductsModal()"
           >
             <i class="bx bx-x"></i> No
           </v-btn>
@@ -1045,7 +1092,7 @@ export default {
           <v-spacer></v-spacer>
           <v-card-actions class="justify-end">
             <v-btn
-              @click="editSentProductsModal = false"
+              @click="closeSendProducttModal"
               icon
               small
               color="gray"
@@ -1058,7 +1105,7 @@ export default {
         <hr />
         <v-card-text>
           <v-row>
-            <v-col cols="4" v-for="pv in sentProductsList" :key="pv.id">
+            <v-col cols="4" v-for="pv in seletedSentProducts" :key="pv.id">
               <v-text-field
                 class=""
                 clearable
@@ -1093,7 +1140,7 @@ export default {
             color="red"
             small
             class="white--text text-capitalize"
-            @click="editSentProductsModal = false"
+            @click="closeSendProducttModal"
           >
             <i class="bx bx-x"></i> No
           </v-btn>
