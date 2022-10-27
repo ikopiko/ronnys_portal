@@ -23,7 +23,6 @@ export const menuItems = [
         icon: "bxs-bank",
         link: "/reports/banks"
     },
-
     {
         id: 11,
         label: "Sales report",

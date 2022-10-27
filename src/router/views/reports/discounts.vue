@@ -1,426 +1,447 @@
-<script>
-import axios from 'axios'
-import excel from 'vue-excel-export'
-import Layout from '../../layouts/main'
-import PageHeader from '@/components/page-header'
-import { GridPlugin, Toolbar, ExcelExport } from "@syncfusion/ej2-vue-grids";
-
-
-import Transaction from './transaction'
-import appConfig from "@/app.config";
-import Vue from 'vue'
-
+`<script>
+import axios from "axios";
+import Layout from "../../layouts/main";
+import DatePicker from "vue2-datepicker";
+import excel from "vue-excel-export";
+import Vue from "vue";
+import moment from "moment";
 Vue.use(excel);
-
-Vue.use(GridPlugin);
-
-/**
- * Products-order component
- */
 export default {
-   page: {
-    title: "Discounts",
-    meta: [{ name: "description", content: appConfig.description }]
+  page: {
+    title: "Sales Report",
   },
-  components: { Layout, PageHeader, Transaction },
+  components: {
+    Layout,
+    DatePicker,
+  },
+  computed: {},
   data() {
     return {
-      excelTitle: "Ronny's",
-      toolbarOptions: ['ExcelExport'],
-      fromDate: String(new Date()),
-      // toDate: String(new Date()),
-      toDate: null,
-      selectedBranch: null,
-      branchURL: null,
-      showAlert: false,
-      alertText: '',
+      modalTotalPrice:null,
+      modalDiscount:null,
+      modalTotalDue:null,
+      order_data:[],
+      modalProductId:null,
+      modalDiscType:null,
+      modalDisc:null,
+      modalCustomer: null,
       orderStatuses: [],
-      exportData: [],
+      detailModal: false,
+      date: [
+        moment(new Date()).format("YYYY-MM-DD"),
+        moment(new Date()).format("YYYY-MM-DD"),
+      ],
+      branch: null,
+      validSearch: true,
+      loader: false,
+      exportName:"All - "+ moment(new Date()).format("YYYY-MM-DD"),
+      json_data: [],
+      snackbar: false,
+      color: "default",
+      snackbarText: null,
+      TOKEN: null,
+      selectedBranch: null,
       branchOptions: [
-        { value: null, text: 'Select Branch'},
-        { value: 'saburtalo', text: 'Saburtalo'},
-        { value: 'vake', text: 'Vake'},
-        { value: 'digomi', text: 'Digomi'},
-        { value: 'gldani', text: 'Gldani'},
+        { value: "Saburtalo", text: "Saburtalo" },
+        { value: "Vake", text: "Vake" },
+        { value: "Digomi", text: "Digomi" },
+        { value: "Gldani", text: "Gldani" },
       ],
-      loggedUser: {},
-      discountedOrders: [],
-      discountedOrdersOld: [],
-      title: 'Dicsounted Orders',
-      items: [
+      warehouseId: null,
+      supplyList: [],
+      suppliesSearch: "",
+      branchURL: null,
+      json_fields: {
+        "Order ID": "id",
+        "Billing Name": "order_data.customer.name",
+        "Total price": "order_data.totalPrice",
+        "Type":"order_data.discountName",
+        "Amount": "order_data.newdiscount",
+        "Total due": "order_data.discounted",
+        "Comment":"order_data.managerComment",
+        "Method":"order_data.paymentType",
+        "Branch": "branch",
+        "status": "statusName",
+        "Date": "finish_date",
+     
+     },
+      supplyHeaders: [
         {
-          text: 'Ecommerce',
-          href: '/',
+          value: "id",
+          text: "Order ID",
+          sortable: true,
         },
         {
-          text: 'Orders',
-          active: true,
+          value: "order_data.customer.name",
+          text: "Billing Name",
+          sortable: true,
         },
-      ],
-      searchVal: null,
-    }
-  },
-  watch: {
-    selectedBranch(val){
-      this.changeBranch(val);
-    },
-    searchVal(val){
-      if(val.length ==0){
-        val = null;
-        this.discountedOrders = this.discountedOrdersOld;
-      }
-      else {
-        
-        // this.discountedOrdersOld = this.discountedOrders;
-        this.discountedOrders = [];
-        this.discountedOrdersOld.forEach((x) =>  {
-         if(String(x.id).includes(val)){
-           if(this.discountedOrders.length == 0)
-            this.discountedOrders = [];
-           
-           this.discountedOrders.push(x);
-
-         }
-        //  if(String(x.order_data.customer.name).includes(val)){
-        //    if(this.discountedOrders.length == 0)
-        //     this.discountedOrders = [];
-           
-        //    this.discountedOrders.push(x);
-
-        //  }
-         if(String(x.order_data.discountName).toLowerCase().includes(val.toLowerCase()) || String(x.order_data.customer.name).toLowerCase().includes(val.toLowerCase())){
-           if(this.discountedOrders.length == 0)
-            this.discountedOrders = [];
-           
-           this.discountedOrders.push(x);
-
-         }
-        })
-      }
       
-    },
+        {
+          value: "finish_date",
+          text: "Date",
+          sortable: true,
+        },
+        {
+          value: "order_data.totalPrice",
+          text: "Total",
+          sortable: true,
+        },
+        {
+          value: "order_data.discountName",
+          text: "Type",
+          sortable: true,
+        },
+        {
+          value: "order_data.newdiscount",
+          text: "Amount",
+          sortable: true,
+        },
+          {
+          value: "order_data.discounted",
+          text: "Discounted",
+          sortable: true,
+        },
+          {
+          value: "order_data.totalDue",
+          text: "Total Due",
+          sortable: true,
+        },
+          {
+          value: "status",
+          text: "Status",
+          sortable: true,
+        },
+          {
+          value: "order_data.paymentType",
+          text: "Method",
+          sortable: true,
+        },
+                 {
+          value: "branch",
+          text: "Branch",
+          sortable: true,
+        },
+          {
+          value: "actions",
+          text: "Details",
+          sortable: true,
+        },
+       
+      ],
+      nameRules: [(v) => !!v || " required"],
+    };
   },
-  //   EXCEL EXPORT CODE
-  provide: {
-    grid: [Toolbar, ExcelExport]
-  },
-  //   END OF EXCEL EXPORT CODE
   mounted() {
-    this.fromDate = this.formatDate(this.fromDate);
-    // this.toDate = this.formatDate(this.toDate);
     this.loggedUser = this.$store.state.authfack.user;
+    this.warehouseId = this.loggedUser.warehouseId;
+    this.TOKEN = this.loggedUser.token;
 
-    const TOKEN = this.loggedUser.token;
-
-    axios
+  axios
       .request({
         method: "post",
         url:
-          this.$hostname + "poses/order-statuses",
+          "http://new.ronnys.info/?r=v1/poses/order-statuses",
         headers: {
-          Authorization: "Bearer " + TOKEN,
+          Authorization: "Bearer " + this.TOKEN
         },
       })
       .then((response) => {
         this.orderStatuses = response.data.data
       });
+
+    this.getReport()
   },
   methods: {
-    // EXPORT METHODS
-     btnClick() {
-      if (this.$refs.Grid.$el.classList.contains('disablegrid')) {
-          this.$refs.Grid.$el.classList.remove('disablegrid');
-          document.getElementById("GridParent").classList.remove('wrapper');
-      }
-      else {
-          this.$refs.Grid.$el.classList.add('disablegrid');
-          document.getElementById("GridParent").classList.add('wrapper');
-      }
+    // eslint-disable-next-line no-unused-vars
+    showDetail(item){
+      this.modalProductId = item.id
+      this.modalDiscType  = item.order_data.discountName
+      this.modalDisc = item.order_data.discount+this.discount(item,"discname")
+      this.modalCustomer =item.order_data.customer.name
+      // eslint-disable-next-line no-console
+      console.log(item.order_data.items)
+      this.order_data = item.order_data.items
+      this.modalTotalPrice = item.order_data.totalPrice
+      this.modalDiscount =  this.discount(item,"discounted")
+      this.modalTotalDue = this.discount(item,"totalDue")
+      this.detailModal = true
     },
-      toolbarClick: function() {
-        //  if (args.item.id === 'Grid_excelexport') { // 'Grid_excelexport' -> Grid component id + _ + toolbar item name
-            let excelExportProperties = {
-                header: {
-                    headerRows: 7,
-                    rows: [
-                        { cells: [{ colSpan: 4, value: this.excelTitle, style: { fontColor: '#000000', fontSize: 32, hAlign: 'Center', bold: true, } }] },
-                        { cells: [{ colSpan: 4, value: "Branch: " + this.selectedBranch, style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
-                        { cells: [{ colSpan: 4, value: "Discounts", style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
-                        { cells: [{ colSpan: 4, value: "Date: " + this.fromDate + " - " + this.toDate, style: { fontColor: '#000000', fontSize: 15, hAlign: 'Center', bold: true, } }] },
-                    ]
-                },
-                footer: {
-                    footerRows: 4,
-                    rows: [
-                        { cells: [{ colSpan: 4, value: "Ronny's", style: { hAlign: 'Center', bold: true } }] },
-                        // { cells: [{ colSpan: 4, value: "!Visit Again!", style: { hAlign: 'Center', bold: true } }] }
-                    ]
-                }
-            };
-            this.$refs.Grid.excelExport(excelExportProperties);
-        // }
+    
+    discount(item, ident){
+        if(ident == "discname") {
+          if(item.order_data.discountName=="Diplomat")
+            return '%'
+          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
+          return "GEL"
+          else return "%"
+          } else if(ident == "discounted") {
+              if(item.order_data.discountName=="Diplomat")
+                 return (item.order_data.totalPrice - item.order_data.totalPrice / 1.18).toFixed(2)
+          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
+          return  item.order_data.discount;
+          else 
+          return ((item.order_data.totalPrice / 100) * item.order_data.discount).toFixed(2)
+          } else if(ident == "totalDue") {
+            if(item.order_data.discountName=="Diplomat")
+              return  (item.order_data.totalPrice-(item.order_data.totalPrice - item.order_data.totalPrice / 1.18)).toFixed(2);
+            else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
+            return (item.order_data.totalPrice - item.order_data.discount).toFixed(2)
+            else 
+          return  (item.order_data.totalPrice-((item.order_data.totalPrice / 100) * item.order_data.discount)).toFixed(2)
+                
+          }
     },
-    // END OF EXPORT METHODS
-    formatDate(date) {
-          var d = new Date(date),
-              month = '' + (d.getMonth() + 1),
-              day = '' + d.getDate(),
-              year = d.getFullYear();
+    getReport() {
+      
+      if (this.$refs.searchForm.validate()) {
+        this.loader = true;
+        this.json_data = []; 
+        this.supplyList = [];
 
-          if (month.length < 2) 
-              month = '0' + month;
-          if (day.length < 2) 
-              day = '0' + day;
-
-          return [year, month, day].join('-');
-    },
-    changeBranch(branch){
-      if(branch == 'saburtalo'){
-        this.branchURL =  this.$hostSaburtalo;
-      } 
-      else if(branch == 'vake'){
-        this.branchURL =  this.$hostVake;
-      } 
-      else if(branch == 'digomi'){
-        this.branchURL =  this.$hostDigomi;
-      } 
-      else if(branch == 'gldani'){
-        this.branchURL =  this.$hostGldani;
-      } 
-    },
-    updateDiscountOrders(){
-      var date
-      if(this.toDate == null) {
-        date = this.fromDate + " to " + this.fromDate
-      }
-      else {
-        date = this.fromDate + " to " + this.toDate
-      }
-      if(this.selectedBranch == null){
-        this.showAlert = true;
-        this.alertText = "Select Branch to continue...";
-      } else {
-
-      const TOKEN = this.loggedUser.token;
-
-      var bodyUpdate = new FormData();
-      bodyUpdate.set("day", date);
-      bodyUpdate.set("branch",this.selectedBranch)
-
-      axios
-        .request({
-          method: "post",
-          url:
-            "http://new.ronnys.info/?r=v1/manager/discounted-orders",
-          headers: {
-            Authorization: "Bearer " + TOKEN,
-          },
-          data: bodyUpdate,
-        })
-        .then((response) => {
-            this.discountedOrders = response.data.data;
-            this.discountedOrdersOld = response.data.data;
-            this.exportData = [];
-
-            this.discountedOrders.forEach(x => {
-              x.id = String(x.id);
-            var index = x.status - 1;
-            x.statusName = this.orderStatuses[index].status_name;
-            if(x.order_data.discountName == 'Diplomat'){
-              x.order_data.discPrice = x.order_data.totalPrice - x.order_data.totalPrice / 1.18;
-              x.order_data.discType = '%';
-              
-            }
-            else if(x.order_data.discountName == 'Manager' && x.order_data.discountAmount == true){
-              x.order_data.discPrice = x.order_data.discount;
-              x.order_data.discType = 'GEL';
-            }
-            else {
-              x.order_data.discPrice = ((x.order_data.totalPrice / 100) * x.order_data.discount).toFixed(2);
-              x.order_data.discType = '%';
-            }
-            x.order_data.totalDue = (x.order_data.totalPrice - x.order_data.discPrice).toFixed(2);
-
-            var excelObject = {};
-            
-
-            excelObject.id = x.id;
-            excelObject.name = x.order_data.customer.name;
-            excelObject.totalPrice = x.order_data.totalPrice;
-            excelObject.discountType = x.order_data.discountName;
-            excelObject.discount = x.order_data.discount + " " + x.order_data.discType;
-            excelObject.amount = x.order_data.discPrice;
-            excelObject.totalDue = x.order_data.totalDue;
-            excelObject.comment = x.order_data.managerComment;
-            excelObject.payment = x.order_data.paymentType;
-            excelObject.status = x.statusName;
-            excelObject.date = x.finish_date;
-
-            this.exportData.push(excelObject);
-
-        });
-
-        });
+        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/discounted-orders"
+        axios
+          .request({
+            method: "post",
+            url: this.branchURL + "",
+            headers: {
+              Authorization: "Bearer " + this.TOKEN,
+            },
+            data: {
+              day: this.date,
+              branch: this.branch
+            },
+          })
+          .then((response) => {
+            this.loader = false;
+            // eslint-disable-next-line no-console
+            this.supplyList = this.json_data = response.data.data
+           
+            this.supplyList.forEach((x) => {
+              x.order_data.newdiscount = x.order_data.discount+this.discount(x, "discname");
+              x.order_data.discounted = this.discount(x,"discounted");
+              x.order_data.totalDue = this.discount(x, "totalDue");
+              x.statusName =  this.orderStatuses[x.status-1].status_name 
+            });
+            // eslint-disable-next-line no-console
+            console.log(this.supplyList)
+          });
       }
     },
+    updateRegion(event) {
+      this.exportName =event+ " - "+this.date
+      
+    }
   },
-}
+};
 </script>
 
 <template>
   <Layout>
-    <PageHeader :title="title" />
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="row">
-              <b-alert v-model="showAlert" dismissible variant="danger">{{ alertText }}</b-alert>
-            </div>
-            <div class="row mb-2">
-              <div class="col-sm-2">
-                <div class="search-box me-2 mb-2 d-inline-block">
-                  <div class="position-relative">
-                    <input type="text" v-model="searchVal" class="form-control" placeholder="Search..." />
-                    <i class="bx bx-search-alt search-icon"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-2">
-                <b-form-select v-model="selectedBranch" class="form-control" :options="branchOptions"></b-form-select>
-              </div>
-              <!-- end col-->
-            </div>
-              <!-- end col-->
-                <div class="row mb-2">
-                  <div class="col-sm-4">
-                    <div>
-                      <label for="example-input">From</label>
-                      <b-input-group class="mb-3">
-                        <b-form-input
-                          id="example-input"
-                          v-model="fromDate"
-                          type="text"
-                          placeholder="YYYY-MM-DD"
-                          autocomplete="off"
-                        ></b-form-input>
-                        <b-input-group-append>
-                          <b-form-datepicker
-                            v-model="fromDate"
-                            button-only
-                            right
-                            locale="en-US"
-                            aria-controls="example-input"
-                          ></b-form-datepicker>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </div>
-                </div>
-                  <div class="col-sm-4">
-                    <div>
-                      <label for="example-input">To</label>
-                      <b-input-group class="mb-3">
-                        <b-form-input
-                          id="example-input"
-                          v-model="toDate"
-                          type="text"
-                          placeholder="YYYY-MM-DD"
-                          autocomplete="off"
-                        ></b-form-input>
-                        <b-input-group-append>
-                          <b-form-datepicker
-                            v-model="toDate"
-                            button-only
-                            right
-                            locale="en-US"
-                            aria-controls="example-input"
-                          ></b-form-datepicker>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </div>
-                </div>
-                  <div class="col-sm-4 mt-4">
-                    <b-button variant="success" @click="updateDiscountOrders(), btnClick()">
-                      <i
-                        class="bx bx-check-double font-size-16 align-middle me-2"
-                      ></i>
-                      Search
-                    </b-button>
-                    <!-- EXCEL EXPORT CODE -->
-                    <b-button variant="primary" class="mx-2" v-if="exportData.length != 0">
-                    
-                    <div id="app">
-                      <!-- <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="btnClick">Enable/Disable Grid</ejs-button> -->
-                      <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="toolbarClick">Excel Export</ejs-button>
-                      <ejs-grid ref='Grid' id='Grid' :dataSource='exportData'  :toolbar='toolbarOptions' height='270px' :allowPaging='true' :allowExcelExport='true' :toolbarClick='toolbarClick'>
-                          <e-columns>
-                              <e-column field="id" headerText="Order ID" ></e-column>
-                              <e-column field="name" headerText="Customer Name"></e-column>
-                              <e-column field="totalPrice" headerText="Total Price" ></e-column>
-                              <e-column field="discountType" headerText="Discount Type"></e-column>
-                              <e-column field="discount" headerText="Discount"></e-column>
-                              <e-column field="amount" headerText="Amount" ></e-column>
-                              <e-column field="totalDue" headerText="Total Due"></e-column>
-                              <e-column field="comment" headerText="Comment"></e-column>
-                              <e-column field="payment" headerText="Payment" ></e-column>
-                              <e-column field="woltCode" headerText="Wolt Code"></e-column>
-                              <e-column field="status" headerText="Status"></e-column>
-                              <e-column field="date" headerText="Date"></e-column>
-                          </e-columns>
-                      </ejs-grid>
-                  </div>
+    <v-card>
+      <v-form ref="searchForm" lazy-validation>
+        <v-row>
+          <v-col cols="4" class="ml-2">
+            <date-picker
+              v-model="date"
+              type="date"
+              value-type="YYYY-MM-DD"
+              format="YYYY-MM-DD"
+              range
+              placeholder="Select date"
+              :rules="nameRules"
+            ></date-picker>
+          </v-col>
+          <v-col cols="4">
+            <v-autocomplete
+              clearable
+              v-model="branch"
+              :items="branchOptions"
+              @change="(event) => updateRegion(event, index)"
+              dense
+              label="Select branch"
+            ></v-autocomplete>
+          </v-col>
+          <v-col cols="2">
+            <v-btn color="primary" elevation="0" @click="getReport()">
+              <v-icon small> mdi-magnify </v-icon>
+              Search
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
+      <v-card-text>
+        <v-card-title class="pl-0">
+          <v-text-field
+            class="col-4 pl-0"
+            clearable
+            dense
+            v-model="suppliesSearch"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+          <export-excel
+            v-if="json_data.length > 0"
+            class="btn btn-success"
+            :data="json_data"
+            :fields="json_fields"
+            worksheet="Worksheet"
+            :name="exportName"
+          >
+            <i class="mdi mdi-download"> Export </i>
+          </export-excel>
+        </v-card-title>
+        <v-data-table
+          dense
+          :loading="loader"
+          loading-text="Loading... Please wait"
+          :headers="supplyHeaders"
+          :items="supplyList"
+          :items-per-page="10"
+          :search="suppliesSearch"
+        >
+          <template v-slot:[`item.status`]="{ item }">
+             <span
+                class="badge badge-pill font-weight-bold badge-soft-success"
+                :class="{
+                  
+                  'badge-soft-warning ': `${item.status}` != 7,
+                }"
+                >{{item.statusName}}</span>
+        
+          </template>
+           
+              
+         
+            <template  v-slot:[`item.actions`]="{ item }">
+              <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon  class="ma-2" color="primary">
+                          <v-icon small @click="showDetail(item)">
+                            mdi-eye
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>View Details</span>
+                  </v-tooltip>
+              
+              
+            </template>
+        </v-data-table>
+      </v-card-text>
+    </v-card>
+    <v-snackbar v-model="snackbar" :color="color" elevation="5">
+      {{ snackbarText }}
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
+      </template>
+    </v-snackbar>
+       
+       <v-dialog v-model="detailModal" max-width="600">
+      <v-card>
+        <v-toolbar color="white" elevation="0">
+          <span class="text-h6"> Order Detail</span>
+          <v-spacer></v-spacer>
+          <v-card-actions class="justify-end">
+            <v-btn @click="detailModal = false" icon small color="gray">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-toolbar>
 
-                    </b-button>
-
-                    <b-button variant="primary" class="mx-2 hidden disablegrid" v-if="exportData.length == 0">
-                    
-                    <div id="app">
-                      <!-- <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="btnClick">Enable/Disable Grid</ejs-button> -->
-                      <ejs-button  iconCss="e-icons e-play-icon" cssClass="e-flat" :isPrimary="true" :isToggle="true" @click="toolbarClick">Excel Export</ejs-button>
-                      <ejs-grid ref='Grid' id='Grid' :dataSource='exportData'  :toolbar='toolbarOptions' height='270px' :allowPaging='true' :allowExcelExport='true' :toolbarClick='toolbarClick'>
-                          <e-columns>
-                              <e-column field="id" headerText="Order ID" ></e-column>
-                              <e-column field="deliveryMethod" headerText="delivery Method"></e-column>
-                              <e-column field="name" headerText="Customer Name"></e-column>
-                              <e-column field="totalPrice" headerText="Total Price" ></e-column>
-                              <e-column field="discountType" headerText="Discount Type"></e-column>
-                              <e-column field="discount" headerText="Discount"></e-column>
-                              <e-column field="amount" headerText="Amount" ></e-column>
-                              <e-column field="totalDue" headerText="Total Due"></e-column>
-                              <e-column field="comment" headerText="Comment"></e-column>
-                              <e-column field="payment" headerText="Payment" ></e-column>
-                              <e-column field="woltCode" headerText="Wolt Code"></e-column>
-                              <e-column field="status" headerText="Status"></e-column>
-                              <e-column field="date" headerText="Date"></e-column>
-                          </e-columns>
-                      </ejs-grid>
-                  </div>
-
-                    </b-button>
-                  </div>
-                <!-- end col-->
+        <hr />
+        <v-card-text>
+          <v-form ref="supplyForm" lazy-validation>
+            <v-row>
+              <p>Order id: <span class="font-size-15 font-weight-bold text-muted">{{modalProductId}}</span></p>
+              <p>Discount Type: <span class="font-size-15 font-weight-bold text-muted">{{modalDiscType}}</span></p>
+                <p>Discount: <span class="font-size-15 font-weight-bold text-muted">{{modalDisc}}</span></p>
+                <p>Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{modalCustomer}}</span></p>
+                <div class="table-responsive">
+                <table class="table table-centered table-nowrap">
+                  <thead>
+                    <tr>
+                      <th scope="col">Product Name</th>
+                      <th scope="col">Product QTY</th>
+                      <th scope="col">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-for="(item, index) in order_data" :key="index">
+                      <td>
+                        <div>
+                          <div class="font-size-15 font-weight-bold text-muted">
+                            {{ item.size }} {{ item.name }}
+                          </div>
+                          <span class="text-muted font-size-14 mb-0">GEL {{ item.price }} x {{ item.qty }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        X {{ item.qty }}
+                      </td>
+                      <td>{{ item.price * item.qty }}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <h6 class="m-0 text-end">Sub Total:</h6>
+                      </td>
+                      <td class="font-size-15 font-weight-bold text-muted">{{modalTotalPrice}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <h6 class="m-0 text-end">Discount:</h6> 
+                      </td>
+                      <td class="font-size-15 font-weight-bold text-muted">{{modalDiscount}}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <h6 class="m-0 text-end">Total Due:</h6>
+                      </td>
+                      <td class="font-size-15 font-weight-bold text-muted">{{modalTotalDue}}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </div>
-            <!-- Table data -->
-            <Transaction :transactions="discountedOrders" />
-          </div>
-          <!-- end card-body -->
-        </div>
-        <!-- end card -->
-      </div>
-      <!-- end col -->
-    <!-- end row -->
+
+
+
+                
+            </v-row>
+          </v-form>
+        </v-card-text>
+        <hr />
+        <v-card-actions>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+         
+
+          <v-btn
+            elevation="0"
+            color="red"
+            small
+            class="white--text text-capitalize"
+            @click="detailModal = false"
+          >
+            <i class="bx bx-x-circle"></i> Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </Layout>
 </template>
-<style>
- @import "../../../../node_modules/@syncfusion/ej2-vue-grids/styles/material.css";
 
- .disablegrid {
-        /* pointer-events: none;
-        opacity: 0.4; */
-        display: none;
-    }
-    .wrapper {
-        cursor: not-allowed;
-    }
-</style>
+<style>
+.table-footer-prepend {
+  margin-top: -58px;
+  height: 58px;
+}
+</style>`
