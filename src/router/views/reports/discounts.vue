@@ -320,7 +320,7 @@ export default {
               <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon  class="ma-2" color="primary">
+                        <v-btn icon   color="primary">
                           <v-icon small @click="showDetail(item)">
                             mdi-eye
                           </v-icon>
@@ -358,10 +358,10 @@ export default {
         <v-card-text>
           <v-form ref="supplyForm" lazy-validation>
             <v-row>
-              <p>Order id: <span class="font-size-15 font-weight-bold text-muted">{{modalProductId}}</span></p>
-              <p>Discount Type: <span class="font-size-15 font-weight-bold text-muted">{{modalDiscType}}</span></p>
-                <p>Discount: <span class="font-size-15 font-weight-bold text-muted">{{modalDisc}}</span></p>
-                <p>Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{modalCustomer}}</span></p>
+              <div>Order id: <span class="font-size-15 font-weight-bold text-muted">{{modalProductId}}</span></div>
+              <div>Discount Type: <span class="font-size-15 font-weight-bold text-muted">{{modalDiscType}}</span></div>
+                <div>Discount: <span class="font-size-15 font-weight-bold text-muted">{{modalDisc}}</span></div>
+                <div>Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{modalCustomer}}</span></div>
                 <div class="table-responsive">
                 <table class="table table-centered table-nowrap">
                   <thead>

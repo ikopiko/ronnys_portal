@@ -309,7 +309,7 @@ export default {
               <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon  class="ma-2" color="primary">
+                        <v-btn icon   color="primary">
                           <v-icon small @click="showDetail(item)">
                             mdi-eye
                           </v-icon>
