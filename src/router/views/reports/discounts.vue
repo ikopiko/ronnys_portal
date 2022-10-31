@@ -305,7 +305,7 @@ export default {
         >
           <template v-slot:[`item.status`]="{ item }">
              <span
-                class="badge badge-pill font-weight-bold badge-soft-success"
+                class="badge badge-pill  badge-soft-success"
                 :class="{
                   
                   'badge-soft-warning ': `${item.status}` != 7,
