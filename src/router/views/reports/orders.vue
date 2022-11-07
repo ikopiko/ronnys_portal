@@ -212,6 +212,7 @@ export default {
             this.supplyList = this.json_data = response.data.data
            
             this.supplyList.forEach((x) => {
+              x.order_data.paymentType = x.order_data.paymentType+"  "+(x.opay_status != null ?x.opay_status:"");
               x.order_data.newdiscount = x.order_data.discount+this.discount(x, "discname");
               x.order_data.discounted = this.discount(x,"discounted");
               x.order_data.totalDue = this.discount(x, "totalDue");
