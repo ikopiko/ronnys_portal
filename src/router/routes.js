@@ -33,6 +33,7 @@ export default [
     meta: { authRequired: true },
     component: () => import('./views/reports/orders')
   },
+
   {
     path: '/reports/banks',
     name: 'Banks',

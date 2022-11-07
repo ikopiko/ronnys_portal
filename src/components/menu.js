@@ -17,6 +17,7 @@ export const menuItems = [
         icon: "bx-list-ol",
         link: "/reports/orders"
     },
+
     {
         id: 10,
         label: "menuitems.bank.text",
