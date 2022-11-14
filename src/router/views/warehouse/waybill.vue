@@ -22,6 +22,7 @@ export default {
     return {
       loader:false,
       waybillModal:false,
+      selectedItem: {},
       showAcceptRecieveProductsBtn: false,
       seletedwaybill: null,
       waybillDetail: null,
@@ -36,12 +37,14 @@ export default {
       waybillHeaders: [
         { text: "WAYBILL NUMBER", align: "start", value: "WAYBILL_NUMBER" },
         { text: "SELLER_NAME", value: "SELLER_NAME" },
+        { text: "IS CONFIRMED", align: "start", value: "IS_CONFIRMED" },
         { text: "ACTIVATE_DATE", value: "ACTIVATE_DATE" },
       
       ],
       waybillDetailHeader:[
          { text: "W_NAME", align: "start", value: "W_NAME" },
          { text: "QUANTITY", align: "start", value: "QUANTITY" },
+         { text: "Barcode", align: "start", value: "BAR_CODE" },
          { text: "PRICE", align: "start", value: "PRICE" },
          { text: "AMOUNT", align: "start", value: "AMOUNT" },
       ],
@@ -50,9 +53,6 @@ export default {
   },
 
   mounted() {
-
-
-
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
@@ -62,7 +62,8 @@ export default {
     // eslint-disable-next-line no-unused-vars
     rowClick(item, row) {
       // eslint-disable-next-line no-console
- 
+
+    this.selectedItem = item;
      this.waybillModal = true
            var bodyFormData = new FormData();
       bodyFormData.set("waybill_id", item.ID);
@@ -102,7 +103,15 @@ export default {
         })
         .then((response) => {
           this.loader = false
-           this.waybillList = response.data
+          var temp = response.data;
+          var temp2 = [];
+
+          temp.forEach(x => {
+            if(x.IS_CONFIRMED == 0){
+              temp2.push(x);
+            }
+          });
+           this.waybillList = temp2;
           // this.waybillList = response.data.filter((rqst) => {
           //   return rqst.status == 1;
           // });
