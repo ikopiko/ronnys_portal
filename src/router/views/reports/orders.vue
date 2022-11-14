@@ -59,6 +59,8 @@ export default {
         "Total price": "order_data.totalPrice",
         "Type":"order_data.discountName",
         "Amount": "order_data.newdiscount",
+        "Split cash": "order_data.splitCash",
+        "Split card": "order_data.splitCard",
         "Total due": "order_data.discounted",
         "Comment":"order_data.managerComment",
         "Method":"order_data.paymentType",
@@ -94,17 +96,17 @@ export default {
           text: "Status",
           sortable: true,
         },
-
- {
+        {
           value: "order_data.totalPrice",
           text: "Total Price",
           sortable: true,
         },
-    {
+        {
           value: "order_data.totalDue",
           text: "Total Due",
           sortable: true,
         },
+       
         {
           value: "finish_date",
           text: "Finish Date",
