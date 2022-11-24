@@ -101,10 +101,11 @@ export default {
       ],
       recieveProductHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "Requested Qty", value: "quanunit" },
+        { text: "Requested Qty", value: "quantity" },
         { text: "Sent Qty", value: "sent_quantity" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "to_warehouse_name" },
+        { text: "Date", value: "main_w_action_date" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       
@@ -164,6 +165,7 @@ export default {
       this.getSupplyList();
       this.productslist();
       this.receiveRequests();
+      
       this.showAcceptListModal = false;
       this.seletedReceiveItems = [];
     },
@@ -237,6 +239,8 @@ export default {
     acceptRecieveRequest(item) {
       this.seletedReceiveItems = [item];
       this.showAcceptListModal = true;
+      this.acceptRequest();
+      this.receiveRequests();
     },
     acceptRecieveProductsSingle(item){
       this.seletedReceiveProductsItems = [item]
@@ -248,7 +252,6 @@ export default {
     },
     acceptRecieveProducts(){
         var k = [];
-        alert('BLA');
       this.seletedReceiveProductsItems.forEach(function (item) {
         // eslint-disable-next-line no-console
         k.push({ id: item.id, quantity: item.quantity });
@@ -303,6 +306,7 @@ export default {
           this.showAcceptListModal = false;
           this.seletedReceiveItems = [];
           this.getSupplyList();
+          this.receiveRequests();
         });
     },
     editSentRequest() {
@@ -352,7 +356,7 @@ export default {
               Authorization: "Bearer " + this.TOKEN,
             },
             data: {
-              product_id: this.supplyId,
+              product_id: this.supplyId.id,
               warehouse_id: this.warehouseId,
               quantity: this.supplyQty,
               minQuantity:this.supplyMinQty
@@ -363,9 +367,16 @@ export default {
             this.color = "success";
             this.snackbarText = response.data;
             this.snackbar = true;
+            this.clearSupplyForm();
             this.getSupplyList();
           });
       }
+    },
+    clearSupplyForm(){
+      this.supplyId = null;
+      // this.warehouseId = null;
+      this.supplyQty = null;
+      this.supplyMinQty = null;
     },
     productslist() {
       axios
@@ -452,6 +463,7 @@ export default {
     },
     cancelSupply() {
       this.supplyModal = false;
+      this.clearSupplyForm();
       this.$refs.supplyForm.reset();
     },
   },
@@ -876,13 +888,13 @@ export default {
       </v-tabs-items>
     </v-card>
 
-    <v-dialog v-model="supplyModal" max-width="800">
+    <v-dialog v-model="supplyModal" persistent max-width="800">
       <v-card>
         <v-toolbar color="white" elevation="0">
           <span class="text-h6"> Add supply</span>
           <v-spacer></v-spacer>
           <v-card-actions class="justify-end">
-            <v-btn @click="supplyModal = false" icon small color="gray">
+            <v-btn @click="cancelSupply" icon small color="gray">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-actions>
@@ -897,8 +909,9 @@ export default {
                   v-model="supplyId"
                   :items="productList"
                   item-text="name"
-                  item-value="id"
+                  
                   dense
+                  return-object
                   clearable
                   :rules="[(v) => !!v || 'Supply is required']"
                   label="Select Product"
