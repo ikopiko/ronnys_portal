@@ -18,7 +18,7 @@ export function configureFakeBackend() {
                     let params = JSON.parse(opts.body);
 
                     axios
-                    .post("https://api.ronnys.info/rest/web/index.php?r=auth", {
+                    .post("http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth", {
                       username: params.email,
                       password: params.password,
                     })

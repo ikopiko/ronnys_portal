@@ -131,7 +131,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/poses/order-statuses",
+          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/poses/order-statuses",
         headers: {
           Authorization: "Bearer " + this.TOKEN
         },
@@ -188,7 +188,7 @@ export default {
         this.json_data = []; 
         this.supplyList = [];
 
-        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/invoice-orders"
+        this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/invoice-orders"
         axios
           .request({
             method: "post",

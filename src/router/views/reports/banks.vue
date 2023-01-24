@@ -104,7 +104,7 @@ export default {
         this.loader = true;
         this.json_data = this.supplyList = [];
 
-        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/poses-detail"
+        this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/poses-detail"
         axios
           .request({
             method: "post",

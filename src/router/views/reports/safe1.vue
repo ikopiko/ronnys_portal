@@ -293,7 +293,7 @@ export default {
         .request({
           method: "post",
           url:
-             "http://new.ronnys.info/?r=v1/reporting/safe-detail",
+             "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/safe-detail",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },
