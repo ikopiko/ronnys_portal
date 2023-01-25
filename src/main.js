@@ -52,9 +52,15 @@ const VueScrollTo = require('vue-scrollto')
 Vue.use(VueScrollTo)
 Vue.config.productionTip = false
 
-Vue.prototype.$hostname = "https://api.ronnys.info/rest/web/index.php?r=v1/";  // TEST
+// Vue.prototype.$hostname = "https://api.ronnys.info/rest/web/index.php?r=v1/";  // TEST
 
-Vue.prototype.$authHostName = "https://api.ronnys.info/rest/web/index.php?r=auth";  // TEST
+// Vue.prototype.$authHostName = "https://api.ronnys.info/rest/web/index.php?r=auth";  // TEST
+
+Vue.prototype.$hostname = "http://45.138.44.229/~ccyvsvam/api/rest/web/index.php?r=v1/";  // IP
+
+Vue.prototype.$authHostName = "http://45.138.44.229/~ccyvsvam/api/rest/web/index.php?r=auth";  // IP
+
+
 
 Vue.prototype.$hostSaburtalo = "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";  // SABURTALO
 
