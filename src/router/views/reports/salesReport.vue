@@ -69,11 +69,11 @@ export default {
         this.loader = true;
         this.json_data = this.supplyList = [];
 
-        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/sales-report"
+        // this.branchURL = "http://new.ronnys.info/?r=v1/reporting/sales-report"
         axios
           .request({
             method: "post",
-            url: this.branchURL + "",
+            url: this.$hostname + "reporting/sales-report",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },

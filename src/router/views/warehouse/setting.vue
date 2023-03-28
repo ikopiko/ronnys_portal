@@ -28,6 +28,11 @@ export default {
     },
       categoryFormTitle() {
       return this.editedCatIndex === -1
+        ? "Add Product Category"
+        : "Edit Product Category";
+    },
+      typeFormTitle() {
+      return this.editedTypeIndex === -1
         ? "Add Category"
         : "Edit Category";
     },
@@ -37,6 +42,13 @@ export default {
   },
 
   watch: {
+    productUnit(val){
+      this.unitsList.forEach(x => {
+        if(x.id == val){
+          this.appendUnitTemp = x.name;
+        }
+      });
+    },
     dialog(val) {
       val || this.close();
     },
@@ -46,6 +58,10 @@ export default {
   },
   data() {
     return {
+      appendUnitTemp: '',
+      portionSize: 0,
+      productValues: [],
+      typesList: [],
       isWarehouseEdited: false,
       snackbarText: null,
       color: "default",
@@ -55,7 +71,9 @@ export default {
       productName: "",
       productUnit: "",
       productCategory: "",
+      productType: "",
       categoryName: '',
+      typeName: '',
       nameRules: [(v) => !!v || "Name is required"],
       email: "",
       emailRules: [
@@ -67,17 +85,21 @@ export default {
       items: ["Item 1", "Item 2", "Item 3", "Item 4"],
       checkbox: false,
       catStatus: -1,
+      typeStatus: -1,
       dialogUnits: false,
       dialogCategories: false,
+      dialogType: false,
       dialogDeleteUnits: false,
       dialog: false,
       dialogDelete: false,
       dialogDeleteProduct: false,
       dialogDeleteCategories: false,
+      dialogDeleteTypes: false,
       unitName: "",
       editedWarehouseIndex: -1,
       editedUnitIndex: -1,
       editedCatIndex: -1, 
+      editedTypeIndex: -1, 
       editedProductIndex: -1,
       productSearch: "",
       editedItem: {
@@ -115,6 +137,7 @@ export default {
           value: "name",
         },
         { text: "Category", value: "category_name", align: "end", sortable: false },
+        { text: "Product Cateogry", value: "product_category_name", align: "end", sortable: false },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       productList: [],
@@ -154,6 +177,7 @@ export default {
     this.getUnits();
     this.getBranch();
     this.getCategories();
+    this.getTypes();
    
      
   },
@@ -223,6 +247,19 @@ export default {
         this.categoriesList = response.data;
       });
     },
+    getTypes(){
+      axios
+      .request({
+        method: "post",
+        url: this.$hostname + "warehouses/category-list",
+        headers: {
+          Authorization: "Bearer " + this.TOKEN,
+        },
+      })
+      .then((response) => {
+        this.typesList = response.data;
+      });
+    },
     editItem(item) {
       this.isWarehouseEdited = true;
       this.name = item.name;
@@ -271,14 +308,26 @@ export default {
     editCategory(item) {
       this.categoryName = item.name;
       this.selectedCategory = item.id;
-      this.catStatus = item.status;
+      this.typeStatus = item.status;
       this.editedCatIndex = item.id;
       this.dialogCategories = true;
+    },
+    editType(item) {
+      this.typeName = item.name;
+      // this.selectedCategory = item.id;
+      this.catStatus = item.status;
+      this.editedTypeIndex = item.id;
+      this.dialogType = true;
     },
     deleteCategory(item) {
       this.editedCatIndex = item.id;
       this.categoryName = item.name;
       this.dialogDeleteCategories = true;
+    },
+    deleteType(item) {
+      this.editedTypeIndex = item.id;
+      this.typeName = item.name;
+      this.dialogDeleteTypes = true;
     },
     deleteCatConfirm() {
 
@@ -302,6 +351,40 @@ export default {
               this.snackbar = true;
               this.getCategories();
               this.closeCatDelete();
+              //  this.successmsg(response.data, "success");
+            })
+            .catch((error) => {
+              // eslint-disable-next-line no-console
+              this.color = "warning";
+              this.snackbarText = error.response.data.error;
+              this.snackbar = true;
+            });
+        }
+    },
+    deleteTypeConfirm() {
+
+      if (this.editedTypeIndex > 0) {
+          var bodyFormDataNew = new FormData();
+          bodyFormDataNew.set("id", parseInt(this.editedTypeIndex));
+          bodyFormDataNew.set("name", this.typeName);
+          bodyFormDataNew.set("status", 4);
+          axios
+            .request({
+              method: "post",
+              url: this.$hostname + "warehouses/create-category",
+              headers: {
+                Authorization: "Bearer " + this.TOKEN,
+              },
+              data: bodyFormDataNew,
+            })
+            .then((response) => {
+              this.color = "success";
+              this.snackbarText = response.data.data;
+              this.snackbar = true;
+              this.getCategories();
+              this.closeCatDelete();
+              this.closeTypeDelete();
+              this.getTypes();
               //  this.successmsg(response.data, "success");
             })
             .catch((error) => {
@@ -401,6 +484,11 @@ export default {
       this.dialogCategories = false;
       this.$refs.form.reset();
     },
+    closeType() {
+      this.editedTypeIndex = -1;
+      this.dialogType = false;
+      this.$refs.form.reset();
+    },
     closeUnits() {
       this.dialogUnits = false;
       this.$refs.form.reset();
@@ -430,6 +518,13 @@ export default {
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedCatIndex = -1;
+      });
+    },
+    closeTypeDelete() {
+      this.dialogDeleteTypes = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedTypeIndex = -1;
       });
     },
     
@@ -601,6 +696,71 @@ export default {
         });
       //  this.successmsg(response.data, "success");
     },
+    saveType(){
+      if (this.$refs.form.validate()) {
+        if (this.editedTypeIndex > 0) {
+          axios
+              .request({
+                method: "post",
+                url: this.$hostname + "warehouses/create-category",
+                headers: {
+                  Authorization: "Bearer " + this.TOKEN,
+                },
+                data: {
+                  id: this.editedTypeIndex,
+                  name: this.typeName,
+                  status: this.typeStatus,
+                },
+              })
+              .then((response) => {
+                this.color = "success";
+                this.snackbarText = response.data.data;
+                this.snackbar = true;
+                this.closeType();
+                this.getTypes();
+                this.productslist();
+                //  this.successmsg(response.data, "success");
+              })
+              .catch((error) => {
+                // eslint-disable-next-line no-console
+                this.color = "warning";
+                this.snackbarText = error.response.data.error;
+                this.snackbar = true;
+                this.closeType();
+              });
+        } else {
+          axios
+              .request({
+                method: "post",
+                url: this.$hostname + "warehouses/create-category",
+                headers: {
+                  Authorization: "Bearer " + this.TOKEN,
+                },
+                data: {
+                  id: '',
+                  name: this.typeName,
+                  status: '',
+                },
+              })
+              .then((response) => {
+                this.color = "success";
+                this.snackbarText = response.data.data;
+                this.snackbar = true;
+                this.closeType();
+                this.getTypes();
+                this.productslist();
+                //  this.successmsg(response.data, "success");
+              })
+              .catch((error) => {
+                // eslint-disable-next-line no-console
+                this.color = "warning";
+                this.snackbarText = error.response.data.error;
+                this.snackbar = true;
+                this.closeType();
+              });
+        }
+      }
+    },
     saveCategory() {
       if (this.$refs.form.validate()) {
         if (this.editedCatIndex > 0) {
@@ -679,7 +839,8 @@ export default {
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
           bodyFormDataNew.set("unit", this.productUnit);
-          bodyFormDataNew.set("products_category_id", this.productCategory);
+          bodyFormDataNew.set("category_id", this.productCategory);
+          bodyFormDataNew.set("products_category_id", this.productType);
           bodyFormDataNew.set("status", 1);
           axios
             .request({
@@ -705,10 +866,24 @@ export default {
               this.snackbar = true;
             });
         } else {
-          var bodyFormData = new FormData();
-          bodyFormData.set("name", this.productName);
-          bodyFormData.set("unit", this.productUnit);
-          bodyFormData.set("products_category_id", this.productCategory);
+          // var bodyFormData = new FormData();
+          var recipe = [];
+          var tempObj = {};
+          if(this.productType == 2){
+            this.productValues.forEach(x => {
+              tempObj.product_id = x.id;
+              tempObj.qty = x.recipeAmount;
+              recipe.push(tempObj);
+              tempObj = {};
+            });
+          }
+          // bodyFormData.set("name", this.productName);
+          // bodyFormData.set("unit", this.productUnit);
+          // bodyFormData.set("products_category_id", this.productCategory);
+          // bodyFormData.set("category_id", this.productType);
+          // bodyFormData.set("recipe", recipe);
+
+
           axios
             .request({
               method: "post",
@@ -716,7 +891,7 @@ export default {
               headers: {
                 Authorization: "Bearer " + this.TOKEN,
               },
-              data: bodyFormData,
+              data: { "products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
             })
             .then((response) => {
               this.successmsg(response.data.data,"success")
@@ -930,7 +1105,7 @@ export default {
               :items-per-page="10"
               :search="productSearch"
             >
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editProduct(item)">
                   mdi-pencil
                 </v-icon>
@@ -991,7 +1166,6 @@ export default {
                       <v-card-actions>
                         <v-spacer></v-spacer>
                       </v-card-actions>
-
                       <v-card-actions>
                         <v-spacer></v-spacer>
 
@@ -1071,7 +1245,7 @@ export default {
         </v-expansion-panel>
 
         <v-expansion-panel>
-          <v-expansion-panel-header>Categories</v-expansion-panel-header>
+          <v-expansion-panel-header>Product Category</v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-data-table
               :headers="categoriesHeaders"
@@ -1199,6 +1373,137 @@ export default {
             </v-data-table>
           </v-expansion-panel-content>
         </v-expansion-panel>
+        
+        <!-- PRODUCT TYPE -->
+        <v-expansion-panel>
+          <v-expansion-panel-header>Categories</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-data-table
+              :headers="categoriesHeaders"
+              :items="typesList"
+              :items-per-page="10"
+            >
+              <template v-slot:top>
+                <v-toolbar flat>
+                  <v-divider class="mx-4" inset vertical></v-divider>
+                  <v-spacer></v-spacer>
+                  <v-dialog v-model="dialogType" max-width="800">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        small
+                        class="text-capitalize"
+                        elevation="0"
+                        color="primary"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        <span
+                          class="bx bx-plus font-size-16 align-middle me-2"
+                        ></span
+                        >add
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="text-h5">{{ typeFormTitle }}</span>
+                      </v-card-title>
+                      <hr />
+                      <v-card-text>
+                        <v-form ref="form" v-model="valid" lazy-validation>
+                          <v-row>
+                            <v-col cols="6">
+                              <v-text-field
+                                dense
+                                v-model="typeName"
+                                :rules="nameRules"
+                                label="Name"
+                                required
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-form>
+                      </v-card-text>
+                      <hr />
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                      </v-card-actions>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          color="success me-2"
+                          elevation="0"
+                          @click="saveType"
+                          small
+                          class="white--text text-capitalize"
+                        >
+                          <i class="bx bx-save"></i> Save
+                        </v-btn>
+
+                        <v-btn
+                          color="red"
+                          small
+                          elevation="0"
+                          class="white--text text-capitalize"
+                          @click="closeType"
+                        >
+                          <i class="bx bx-x-circle"></i> Cancel
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
+                  <v-dialog v-model="dialogDeleteTypes" max-width="500">
+                    <v-card>
+                      <v-card-title class="text-h5"
+                        >Are you sure you want to delete this
+                        category?</v-card-title
+                      >
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          elevation="0"
+                          color="success"
+                          small
+                          @click="deleteTypeConfirm"
+                        >
+                          <i class="bx bx-save"></i> Yes</v-btn
+                        >
+                        <v-btn
+                          elevation="0"
+                          color="error"
+                          small
+                          @click="closeTypeDelete"
+                        >
+                          <i class="bx bx-x-circle"></i>Cancel</v-btn
+                        >
+                        <v-spacer></v-spacer>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </v-toolbar>
+              </template>
+              <template v-slot:[`item.status_key`]="{ item }">
+                <span
+                  class="badge rounded-pill font-size-12"
+                  :class="
+                    item.status == 1
+                      ? 'badge-soft-success'
+                      : 'badge-soft-danger'
+                  "
+                >
+                  {{ item.status_key }}
+                </span>
+              </template>
+              <template c v-slot:[`item.actions`]="{ item }">
+                <v-icon small class="mr-2" @click="editType(item)">
+                  mdi-pencil
+                </v-icon>
+                <v-icon small @click="deleteType(item)"> mdi-delete </v-icon>
+              </template>
+            </v-data-table>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
       </v-expansion-panels>
 
       <v-dialog v-model="showProductModal" max-width="800">
@@ -1210,7 +1515,7 @@ export default {
           <v-card-text>
             <v-form ref="productForm" v-model="validProduct" lazy-validation>
               <v-row>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-text-field
                     dense
                     v-model="productName"
@@ -1219,7 +1524,7 @@ export default {
                     required
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-autocomplete
                     v-model="productUnit"
                     :items="unitsList"
@@ -1228,11 +1533,11 @@ export default {
                     required
                     dense
                     clearable
-                    :rules="[(v) => !!v || 'Item is required']"
+                    :rules="[(v) => !!v || 'Unit is required']"
                     label="Select Unit"
                   ></v-autocomplete>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-autocomplete
                     v-model="productCategory"
                     :items="categoriesList"
@@ -1245,7 +1550,61 @@ export default {
                     label="Select Category"
                   ></v-autocomplete>
                 </v-col>
+                <v-col cols="3">
+                  <v-autocomplete
+                    v-model="productType"
+                    :items="typesList"
+                    item-text="name"
+                    item-value="id"
+                    required
+                    dense
+                    clearable
+                    :rules="[(v) => !!v || 'Product type is required']"
+                    label="Select Product Type"
+                  ></v-autocomplete>
+                </v-col>
               </v-row>
+              <v-row v-if="productType == 2">
+              <v-col cols="8">
+                <v-autocomplete
+                  v-model="productValues"
+                  :items="productList"
+                  item-text="name"
+                  label="Choose product"
+                  return-object
+                  hide-selected
+                  clearable
+                  chips
+                  small-chips
+                  deletable-chips
+                  multiple
+                ></v-autocomplete>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                  class="my-5"
+                  clearable
+                  dense
+                  v-model="portionSize"
+                  :append-icon="appendUnitTemp"
+                  :label="'Enter Portion Size'"
+                ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-row>
+                <v-col cols="3" v-for="pv in productValues" :key="pv.id">
+                  <v-text-field
+                    class=""
+                    clearable
+                    dense
+                    v-model="pv.recipeAmount"
+                    :append-icon="pv.unit"
+                    :label="'Enter ' + pv.name + ' quantity'"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
             </v-form>
           </v-card-text>
           <hr />

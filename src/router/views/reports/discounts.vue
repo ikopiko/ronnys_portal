@@ -141,7 +141,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/poses/order-statuses",
+          this.$hostname + "poses/order-statuses",
         headers: {
           Authorization: "Bearer " + this.TOKEN
         },
@@ -199,11 +199,10 @@ export default {
         this.json_data = []; 
         this.supplyList = [];
 
-        this.branchURL = "http://new.ronnys.info/?r=v1/reporting/discounted-orders"
         axios
           .request({
             method: "post",
-            url: this.branchURL + "",
+            url: this.$hostname + "reporting/discounted-orders",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },

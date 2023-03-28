@@ -56,9 +56,9 @@ Vue.config.productionTip = false
 
 // Vue.prototype.$authHostName = "https://api.ronnys.info/rest/web/index.php?r=auth";  // TEST
 
-Vue.prototype.$hostname = "http://45.138.44.229/~ccyvsvam/api/rest/web/index.php?r=v1/";  // IP
+Vue.prototype.$hostname = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/";  // GRENA PRODUCTION
 
-Vue.prototype.$authHostName = "http://45.138.44.229/~ccyvsvam/api/rest/web/index.php?r=auth";  // IP
+Vue.prototype.$authHostName = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth";  // GRENA PRODUCTION
 
 
 

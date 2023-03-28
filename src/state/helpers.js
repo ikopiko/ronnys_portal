@@ -1,10 +1,10 @@
 import { mapState, mapGetters, mapActions } from 'vuex'
 
 export const authComputed = {
-  ...mapState('auth', {
+    ...mapState('auth', {
     currentUser: (state) => state.currentUser,
   }),
-  ...mapGetters('auth', ['loggedIn']),
+    ...mapGetters('auth', ['loggedIn']),
 }
 
 export const layoutComputed = {

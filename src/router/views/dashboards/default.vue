@@ -68,7 +68,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/orders/list-reporting",
+          this.$hostname + "orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -99,7 +99,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/orders/list-reporting",
+        this.$hostname +  "orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -129,7 +129,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/orders/list-reporting",
+        this.$hostname + "orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -159,7 +159,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/orders/list-reporting",
+        this.$hostname + "orders/list-reporting",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },

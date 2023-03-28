@@ -91,7 +91,7 @@ export default {
         axios
           .request({
             method: "post",
-            url: this.branchURL + "reporting/toppings-report",
+            url: this.$hostname + "reporting/toppings-report",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },
