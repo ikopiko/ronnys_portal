@@ -68,11 +68,7 @@ export default {
       .request({
         method: "post",
         url:
-<<<<<<< HEAD
           "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-=======
-          this.$hostname + "orders/list-reporting",
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -103,11 +99,7 @@ export default {
       .request({
         method: "post",
         url:
-<<<<<<< HEAD
           "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-=======
-        this.$hostname +  "orders/list-reporting",
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -137,11 +129,7 @@ export default {
       .request({
         method: "post",
         url:
-<<<<<<< HEAD
           "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-=======
-        this.$hostname + "orders/list-reporting",
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -171,11 +159,7 @@ export default {
       .request({
         method: "post",
         url:
-<<<<<<< HEAD
           "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-=======
-        this.$hostname + "orders/list-reporting",
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
