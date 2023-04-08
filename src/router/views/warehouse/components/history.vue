@@ -27,13 +27,39 @@
                 :search="dataSearch"
                 v-model="selectedItem"
               >
+              <template v-slot:[`item.overspent`]="{ item }">
+                  <v-tooltip top v-if="item.overspend == 1">
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2" color="red">
+                          <v-icon small>
+                            mdi-alert
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>Recipe Overspent</span>
+                  </v-tooltip>
+                  <v-tooltip top v-else>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2" color="green">
+                          <v-icon small>
+                            mdi-check
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>Correct Recipe</span>
+                  </v-tooltip>
+                </template>
               <template v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small class="ma-2" color="red">
                           <v-icon small @click="deleteSupply(item)">
-                            mdi-recycle
+                            mdi-delete
                           </v-icon>
                         </v-btn>
                       </span>
@@ -62,7 +88,7 @@
                   class=""
                   clearable
                   dense
-                  v-model="product.quantity"
+                  v-model="tempQty"
                   :label="'Portion Amount'"
                 ></v-text-field>
             </v-row>
@@ -74,12 +100,11 @@
                   clearable
                   dense
                   :rules="[(v) => !!v || 'Supply is required']"
-                  v-model="pv.quantity"
+                  v-model="pv.batchQuantity"
                   :label="'Enter ' + pv.product_name + ' quantity'"
                 ></v-text-field>
-
                 <div>
-                  Amount By Repice: {{ (pv.quantity * product.quantity) }}
+                  Amount By Repice: {{ (pv.quantity * tempQty) }}
                 </div>
               </v-col>
             </v-row>
@@ -96,7 +121,7 @@
             elevation="0"
             small
             class="white--text text-capitalize"
-            @click="alert('ADD');"
+            @click="supplyDone()"
           >
             <i class="bx bx-save"></i> add
           </v-btn>
@@ -112,6 +137,33 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+
+      <v-dialog
+        v-model="deleteItemDialog"
+        width="400px"
+      >
+        <v-card>
+          <v-card-title>
+            <span>Are you sure to delete supply?</span>
+          </v-card-title>
+          <v-card-actions>
+            <v-btn
+              color="primary"
+              variant="text"
+              @click="confirmDeleteSupply"
+            >
+              Confirm
+            </v-btn>
+            <v-btn
+              color="error"
+              variant="text"
+              @click="deleteItemDialog = false"
+            >
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
   </template>
   
@@ -137,12 +189,17 @@ export default {
 
   data() {
     return {
+      deleteItemDialog: false,
+      tempQty: '',
+      tempItem: {},
+      supplyItems: [],
       dataHeaders: [
         { text: "Name", align: "start", value: "product_name" },
         { text: "From Warehouse", value: "from_warehouse_name" },
         { text: "To Warehouse", value: "to_warehouse_name" },
         { text: "Quantity", value: "quantity" },
         { text: "Unit", value: "unit" },
+        { text: "Overspent", value: "overspent" },
         { text: "Actions", value: "actions", sortable: false, align: "end" },
       ],
       dataSearch: '',
@@ -167,10 +224,73 @@ export default {
   methods: {
     editSupply(item){
         this.getSemiItems(item);
-        
+        this.tempQty = item.quantity;
+        this.tempItem = item;
+    },
+    supplyDone(){
+      if(this.tempItem.products_category_id == 2){
+          this.semiItems.forEach(x => {
+            var temp_obj = {};
+
+              temp_obj.product_id = x.id;
+              temp_obj.quantity = x.batchQuantity;
+              temp_obj.default_quantity = x.quantity * this.tempQty;
+
+            this.supplyItems.push(temp_obj);
+            this.temp_obj = {};
+          })
+          this.supplyQty = this.portionQty;
+        } else {
+          this.supplyItems = {};
+        }
+        axios
+          .request({
+            method: "post",
+            url: this.$hostname + "warehouses/update-supply",
+            headers: {
+              Authorization: "Bearer " + this.TOKEN,
+            },
+            data: {
+              supply_id: this.tempItem.supplie_id,
+              action: 'update',
+              quantity: this.supplyQty,
+              items : this.supplyItems
+            },
+          })
+          .then((response) => {
+            this.supplyModal = false;
+            this.color = "success";
+            this.snackbarText = response.data.data;
+            this.snackbar = true;
+            this.getData(this.product.product_id);
+          });
     },
     deleteSupply(item){
-        alert('Delete ' + item.id);
+      this.tempItem = item;
+      this.deleteItemDialog = true;
+    },
+    confirmDeleteSupply(){
+      axios
+        .request({
+        method: "post",
+        url: this.$hostname + "warehouses/update-supply",
+        headers: {
+          Authorization: "Bearer " + this.TOKEN,
+        },
+        data: {
+          supply_id: this.tempItem.supplie_id,
+          action: 'delete',
+          quantity: this.supplyQty,
+          items : {}
+        },
+      })
+      .then((response) => {
+        this.deleteItemDialog = false;
+        this.color = "success";
+        this.snackbarText = response.data.data;
+        this.snackbar = true;
+        this.getData(this.product.product_id);
+      });
     },
     getData(id){
         axios

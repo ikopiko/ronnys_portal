@@ -70,7 +70,6 @@ Vue.prototype.$hostDigomi = "http://109.172.176.98:8082/ronny/rest/web/index.php
 
 Vue.prototype.$hostGldani = "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";  // GLDANI
 
-
 Vue.use(BootstrapVue)
 Vue.use(Vuelidate)
 Vue.use(VueMask)
