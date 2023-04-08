@@ -18,7 +18,11 @@ export function configureFakeBackend() {
                     let params = JSON.parse(opts.body);
 
                     axios
+<<<<<<< HEAD
                     .post("http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth", {
+=======
+                    .post('http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth', {
+>>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
                       username: params.email,
                       password: params.password,
                     })

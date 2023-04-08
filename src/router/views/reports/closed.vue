@@ -101,11 +101,14 @@ export default {
         this.loader = true;
         this.json_data = this.supplyList = [];
 
+<<<<<<< HEAD
         this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/get-close-day"
+=======
+>>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         axios
           .request({
             method: "post",
-            url: this.branchURL + "",
+            url: this.$hostname + "reporting/get-close-day",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },

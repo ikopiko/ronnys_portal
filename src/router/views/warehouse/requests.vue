@@ -2,6 +2,8 @@
 import axios from "axios";
 import Layout from "../../layouts/main";
 import requesModal from "./components/request.vue";
+import wasteModal from "./components/waste.vue";
+import historyModal from "./components/history.vue";
 import { newRequest } from "../../../firebase";
 
 //import Swal from "sweetalert2";
@@ -21,10 +23,20 @@ export default {
   components: {
     Layout,
     requesModal,
+    wasteModal,
+    historyModal,
   },
   computed: {},
 
   watch: {
+    supplyId(val){
+      if(val.category_id == 2){
+        this.getRecipe(val);
+        this.semiSelected = true;
+      } else {
+        this.semiSelected = false;
+      }
+    },
     newRequestList: function () {
             var newRequestListArray = Object.values(this.newRequestList);
       // eslint-disable-next-line no-console
@@ -58,6 +70,13 @@ export default {
   },
   data() {
     return {
+      supplyItems: [],
+      productRecipe: {},
+      semiSelected: false,
+      wastProducteModal: false,
+      historyProducteModal: false,
+      productToWaste: {},
+      productForHistory: {},
       showAcceptRecieveProductsBtn:false,
       seletedReceiveProductsItems: [],
       showRecieveProductsModal:false,
@@ -79,8 +98,9 @@ export default {
       supplyMinQty: null,
       warehouseId: null,
       supplyModal: false,
-      supplyId: null,
+      supplyId: {},
       supplyQty: null,
+      portionQty: 1,
       recieveProductList: [],
       supplyList: [],
       suppliesSearch: "",
@@ -101,10 +121,11 @@ export default {
       ],
       recieveProductHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "Requested Qty", value: "quanunit" },
+        { text: "Requested Qty", value: "quantity" },
         { text: "Sent Qty", value: "sent_quantity" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "to_warehouse_name" },
+        { text: "Date", value: "main_w_action_date" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       
@@ -142,6 +163,14 @@ export default {
     this.receiveRequests();
   },
   methods: {
+    wasteProduct(product){
+      this.productToWaste = product;
+      this.wastProducteModal = true;
+    },
+    productHistory(product) {
+      this.historyProducteModal = true
+      this.productForHistory = product;
+    },
     closeSendProducttModal(){
       this.sentRequests();
       this.getSupplyList();
@@ -164,6 +193,7 @@ export default {
       this.getSupplyList();
       this.productslist();
       this.receiveRequests();
+      
       this.showAcceptListModal = false;
       this.seletedReceiveItems = [];
     },
@@ -175,6 +205,16 @@ export default {
       // closeSendRequestModal
       this.seletedSentProducts = [];
       this.sendRequestModal = false;
+    },
+    closeWasteModal() {
+      this.getSupplyList();
+      this.productslist();
+      this.wastProducteModal = false;
+    },
+    closeHistryeModal() {
+      this.getSupplyList();
+      this.productslist();
+      this.historyProducteModal = false;
     },
     rejectRequestSingle(id) {
       axios
@@ -237,6 +277,8 @@ export default {
     acceptRecieveRequest(item) {
       this.seletedReceiveItems = [item];
       this.showAcceptListModal = true;
+      this.acceptRequest();
+      this.receiveRequests();
     },
     acceptRecieveProductsSingle(item){
       this.seletedReceiveProductsItems = [item]
@@ -248,7 +290,6 @@ export default {
     },
     acceptRecieveProducts(){
         var k = [];
-        alert('BLA');
       this.seletedReceiveProductsItems.forEach(function (item) {
         // eslint-disable-next-line no-console
         k.push({ id: item.id, quantity: item.quantity });
@@ -303,6 +344,7 @@ export default {
           this.showAcceptListModal = false;
           this.seletedReceiveItems = [];
           this.getSupplyList();
+          this.receiveRequests();
         });
     },
     editSentRequest() {
@@ -344,28 +386,80 @@ export default {
     },
     addSupply() {
       if (this.$refs.supplyForm.validate()) {
+        if(this.supplyId.category_id == 2){
+          this.productRecipe.forEach(x => {
+            var temp_obj = {};
+            
+            
+              temp_obj.product_id = x.child_product_id;
+              temp_obj.qty = x.batchAmount;
+              temp_obj.default_qty = x.qty;
+            
+            
+            this.supplyItems.push(temp_obj);
+            // this.supplyItems = temp_obj
+            this.temp_obj = {};
+          })
+          this.supplyQty = this.portionQty;
+        } else {
+          this.supplyItems = {};
+
+        }
+
         axios
           .request({
             method: "post",
-            url: this.$hostname + "warehouses/add-supply",
+            url: this.$hostname + "warehouses/create-supply",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },
             data: {
-              product_id: this.supplyId,
-              warehouse_id: this.warehouseId,
+              product_id: this.supplyId.id,
               quantity: this.supplyQty,
-              minQuantity:this.supplyMinQty
+              items : this.supplyItems
             },
           })
           .then((response) => {
             this.supplyModal = false;
             this.color = "success";
-            this.snackbarText = response.data;
+            this.snackbarText = response.data.data;
             this.snackbar = true;
+            this.clearSupplyForm();
+            this.clearSemiForm();
             this.getSupplyList();
           });
+
       }
+    },
+    clearSupplyForm(){
+      this.supplyId = null;
+      // this.warehouseId = null;
+      this.supplyQty = null;
+      this.portionQty = null;
+      this.supplyMinQty = null;
+      this.semiSelected = false;
+    },
+    clearSemiForm(){
+      this.supplyId = null;
+      // this.warehouseId = null;
+      this.supplyQty = null;
+      this.supplyMinQty = null;
+    },
+    getRecipe(val) {
+      var bodyFormData = new FormData();
+      bodyFormData.set("product_id", val.id);
+      axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/get-recipe",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+          data: bodyFormData,
+        })
+        .then((response) => {
+          this.productRecipe = response.data;
+        });
     },
     productslist() {
       axios
@@ -452,6 +546,7 @@ export default {
     },
     cancelSupply() {
       this.supplyModal = false;
+      this.clearSupplyForm();
       this.$refs.supplyForm.reset();
     },
   },
@@ -462,6 +557,14 @@ export default {
   <Layout>
     <v-dialog v-model="sendRequestModal" max-width="1100">
       <requesModal :token="this.TOKEN" :method="asd" @closeModal="closeSendRequestModal" />
+    </v-dialog>
+
+    <v-dialog v-model="wastProducteModal" max-width="1100">
+      <wasteModal :token="this.TOKEN" :product="productToWaste"  @closeModal="closeWasteModal" />
+    </v-dialog>
+
+    <v-dialog v-model="historyProducteModal" max-width="1100">
+      <historyModal :token="this.TOKEN" :product="productForHistory"  @closeModal="closeHistryeModal" />
     </v-dialog>
 
     <v-card elevation="1" class="bg-primary">
@@ -517,12 +620,24 @@ export default {
                     {{ item.quantity }} {{ item.unit }}
                   </span>
                 </template>
-                <template c v-slot:[`item.actions`]="{ item }">
+                <template v-slot:[`item.actions`]="{ item }">
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2" color="red">
+                          <v-icon small @click="wasteProduct(item)">
+                            mdi-recycle
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>Waste item</span>
+                  </v-tooltip>
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small class="ma-2" color="green">
-                          <v-icon small @click="deleteProduct(item)">
+                          <v-icon small @click="productHistory(item)">
                             mdi-eye
                           </v-icon>
                         </v-btn>
@@ -571,7 +686,7 @@ export default {
                     {{ item.status == 1 ? "Pending" : "accepted" }}
                   </span>
                 </template>
-                <template c v-slot:[`item.actions`]="{ item }">
+                <template v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
@@ -876,13 +991,13 @@ export default {
       </v-tabs-items>
     </v-card>
 
-    <v-dialog v-model="supplyModal" max-width="800">
+    <v-dialog v-model="supplyModal" persistent max-width="800">
       <v-card>
         <v-toolbar color="white" elevation="0">
           <span class="text-h6"> Add supply</span>
           <v-spacer></v-spacer>
           <v-card-actions class="justify-end">
-            <v-btn @click="supplyModal = false" icon small color="gray">
+            <v-btn @click="cancelSupply" icon small color="gray">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-card-actions>
@@ -897,8 +1012,8 @@ export default {
                   v-model="supplyId"
                   :items="productList"
                   item-text="name"
-                  item-value="id"
                   dense
+                  return-object
                   clearable
                   :rules="[(v) => !!v || 'Supply is required']"
                   label="Select Product"
@@ -906,12 +1021,20 @@ export default {
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                  v-if="semiSelected"
+                  dense
+                  v-model="portionQty"
+                  :rules="[(v) => !!v || 'Portion quantity is required']"
+                  label="Portion quantity"
+                  required
+                ></v-text-field>
+                <v-text-field
+                  v-else
                   dense
                   v-model="supplyQty"
-                  :rules="[(v) => !!v || 'Quantity is required']"
-                  label="Quantity"
+                  :rules="[(v) => !!v || 'Amount is required']"
+                  label="Amount"
                   required
-               
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
@@ -922,6 +1045,24 @@ export default {
                   label="Minimum amount"
                   required
                 ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row v-if="semiSelected">
+              <span class="text-h6" style="color:black"> Create Semi-Finished Product By Recipe</span>
+              <v-col cols="3" v-for="pv in productRecipe" :key="pv.id">
+                <v-text-field
+                  class=""
+                  clearable
+                  dense
+                  v-model="pv.batchAmount"
+                  :rules="[(v) => !!v || 'Supply is required']"
+                  :append-icon="pv.unit"
+                  :label="'Enter ' + pv.child_product_name + ' quantity'"
+                ></v-text-field>
+
+                <div>
+                  Amount By Repice: {{ (pv.qty * portionQty) + ' ' + pv.unit.toUpperCase() }}
+                </div>
               </v-col>
             </v-row>
           </v-form>

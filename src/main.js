@@ -52,9 +52,21 @@ const VueScrollTo = require('vue-scrollto')
 Vue.use(VueScrollTo)
 Vue.config.productionTip = false
 
+<<<<<<< HEAD
 Vue.prototype.$hostname = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/";  // TEST
 
 Vue.prototype.$authHostName = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth";  // TEST
+=======
+// Vue.prototype.$hostname = "https://api.ronnys.info/rest/web/index.php?r=v1/";  // TEST
+
+// Vue.prototype.$authHostName = "https://api.ronnys.info/rest/web/index.php?r=auth";  // TEST
+
+Vue.prototype.$hostname = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/";  // GRENA PRODUCTION
+
+Vue.prototype.$authHostName = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=auth";  // GRENA PRODUCTION
+
+
+>>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
 
 Vue.prototype.$hostSaburtalo = "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";  // SABURTALO
 
@@ -63,7 +75,6 @@ Vue.prototype.$hostVake = "http://94.43.92.102:8082/ronny/rest/web/index.php?r=v
 Vue.prototype.$hostDigomi = "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/";  // DIGOMI
 
 Vue.prototype.$hostGldani = "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";  // GLDANI
-
 
 Vue.use(BootstrapVue)
 Vue.use(Vuelidate)
