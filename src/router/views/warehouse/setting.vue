@@ -136,8 +136,8 @@ export default {
           align: "start",
           value: "name",
         },
-        { text: "Category", value: "category_name", align: "end", sortable: false },
-        { text: "Product Cateogry", value: "product_category_name", align: "end", sortable: false },
+        { text: "Category", value: "category_name", align: "end"},
+        { text: "Product Cateogry", value: "product_category_name", align: "end" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       productList: [],
@@ -268,9 +268,14 @@ export default {
       this.dialog = true;
     },
     editProduct(item) {
-      this.productName = item.name;
-      this.productUnit = parseInt(item.unit);
-      this.productCategory = item.products_category_id;
+      // eslint-disable-next-line no-console
+      console.log(item)
+ 
+     
+     this.productName = item.name;
+      this.productUnit = parseInt(1);
+      this.productCategory = parseInt(item.products_category_id);
+      this.productType = parseInt(item.category_id);
       this.editedProductIndex = item.id;
       this.showProductModal = true;
     },
@@ -279,6 +284,7 @@ export default {
       console.log(item)
       this.productName = item.name;
       this.productUnit = item.unit;
+      this.productType = parseInt(item.category_id);
       this.productCategory = parseInt(item.products_category_id);
       this.editedProductIndex = parseInt(item.id);
       this.dialogDeleteProduct = true;
@@ -306,13 +312,15 @@ export default {
       this.dialogDelete = true;
     },
     editCategory(item) {
+
       this.categoryName = item.name;
       this.selectedCategory = item.id;
-      this.typeStatus = item.status;
+      this.catStatus = item.status;
       this.editedCatIndex = item.id;
       this.dialogCategories = true;
     },
     editType(item) {
+      
       this.typeName = item.name;
       // this.selectedCategory = item.id;
       this.catStatus = item.status;
@@ -394,6 +402,9 @@ export default {
               this.snackbar = true;
             });
         }
+           this.editedTypeIndex = -1
+         this.typeName = ""
+          this.catStatus  = -1
     },
    
     deleteItemConfirm() {
@@ -407,6 +418,7 @@ export default {
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
           bodyFormDataNew.set("unit", this.productUnit);
+          bodyFormDataNew.set("category_id", this.productUnit);
           bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 4);
           axios
@@ -419,7 +431,7 @@ export default {
               data: bodyFormDataNew,
             })
             .then((response) => {
-              this.color = "success";
+               this.color = "success";
               this.snackbarText = response.data.data;
               this.snackbar = true;
               this.closeAddproduct();
@@ -709,7 +721,7 @@ export default {
                 data: {
                   id: this.editedTypeIndex,
                   name: this.typeName,
-                  status: this.typeStatus,
+                  status: this.catStatus,
                 },
               })
               .then((response) => {
@@ -728,7 +740,8 @@ export default {
                 this.snackbar = true;
                 this.closeType();
               });
-        } else {
+        } 
+        else {
           axios
               .request({
                 method: "post",
@@ -759,6 +772,10 @@ export default {
                 this.closeType();
               });
         }
+        this.editedTypeIndex = -1
+         this.typeName = ""
+          this.catStatus  = -1
+
       }
     },
     saveCategory() {
@@ -820,6 +837,7 @@ export default {
               this.snackbar = true;
             });
         }
+        this.editedCatIndex = -1
       }
       if (this.editedCatIndex > -1) {
         Object.assign(
@@ -839,8 +857,8 @@ export default {
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
           bodyFormDataNew.set("unit", this.productUnit);
-          bodyFormDataNew.set("category_id", this.productCategory);
-          bodyFormDataNew.set("products_category_id", this.productType);
+          bodyFormDataNew.set("category_id", this.productType);
+          bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 1);
           axios
             .request({
@@ -894,7 +912,7 @@ export default {
               data: { "products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
             })
             .then((response) => {
-              this.successmsg(response.data.data,"success")
+            //  this.successmsg(response.data.data,"success")
               this.closeAddproduct();
               this.productslist();
               this.color = "success";
@@ -1068,7 +1086,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item)">
                   mdi-pencil
                 </v-icon>
@@ -1234,7 +1252,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editUnit(item)">
                   mdi-pencil
                 </v-icon>
@@ -1364,7 +1382,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editCategory(item)">
                   mdi-pencil
                 </v-icon>
@@ -1495,7 +1513,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editType(item)">
                   mdi-pencil
                 </v-icon>
