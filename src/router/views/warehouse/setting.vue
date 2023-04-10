@@ -432,7 +432,7 @@ export default {
             })
             .then((response) => {
                this.color = "success";
-              this.snackbarText = response.data.data;
+              this.snackbarText = response.data;
               this.snackbar = true;
               this.closeAddproduct();
               this.productslist();
