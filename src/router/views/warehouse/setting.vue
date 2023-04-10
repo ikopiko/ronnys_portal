@@ -431,8 +431,8 @@ export default {
               data: bodyFormDataNew,
             })
             .then((response) => {
-               this.color = "success";
-              this.snackbarText = response.data;
+              this.color = "success";
+              this.snackbarText = response.data.data;
               this.snackbar = true;
               this.closeAddproduct();
               this.productslist();
