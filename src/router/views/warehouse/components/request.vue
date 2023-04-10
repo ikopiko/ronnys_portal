@@ -78,6 +78,8 @@ export default {
           this.snackbarText = response.data.data;
           this.snackbar = true;
           this.responseData = response;
+          this.request = [];
+        
           this.closeModal();
         });
     },
