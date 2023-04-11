@@ -169,6 +169,7 @@ export default {
     },
   },
   mounted() {
+    
     this.loggedUser = this.$store.state.authfack.user;
 
     this.TOKEN = this.loggedUser.token;
@@ -421,6 +422,7 @@ export default {
           bodyFormDataNew.set("category_id", this.productUnit);
           bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 4);
+          bodyFormDataNew.set("portion_size", 1);
           axios
             .request({
               method: "post",
@@ -431,7 +433,7 @@ export default {
               data: bodyFormDataNew,
             })
             .then((response) => {
-               this.color = "success";
+              this.color = "success";
               this.snackbarText = response.data.data;
               this.snackbar = true;
               this.closeAddproduct();
@@ -507,8 +509,8 @@ export default {
     },
     closeAddproduct() {
       this.showProductModal = false;
-      this.$refs.productForm.reset();
       this.editedProductIndex = -1;
+     // this.$refs.productForm.reset();
     },
 
     closeDelete() {
@@ -860,6 +862,8 @@ export default {
           bodyFormDataNew.set("category_id", this.productType);
           bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 1);
+          bodyFormDataNew.set("portion_size", this.portionSize);
+          
           axios
             .request({
               method: "post",
@@ -909,7 +913,7 @@ export default {
               headers: {
                 Authorization: "Bearer " + this.TOKEN,
               },
-              data: { "products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
+              data: {"portion_size": this.portionSize,"products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
             })
             .then((response) => {
             //  this.successmsg(response.data.data,"success")
