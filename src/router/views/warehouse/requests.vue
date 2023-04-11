@@ -114,15 +114,15 @@ export default {
       recieveProductSearch: "",
       requestHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "quantity", value: "sum" },
+        { text: "quantity", value: "quanunit" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "to_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
       recieveProductHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "Requested Qty", value: "quantity" },
-        { text: "Sent Qty", value: "sent_quantity" },
+        { text: "Requested Qty", value: "quanunit" },
+        { text: "Sent Qty", value: "sent_quanunity" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "to_warehouse_name" },
         { text: "Date", value: "main_w_action_date" },
@@ -133,7 +133,7 @@ export default {
       receiveRequestSearch: "",
       receiveRequestHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "Requested Qty", value: "quantity" },
+        { text: "Requested Qty", value: "quanunity" },
         { text: "Sent Qty", value: "sent_quantity" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "from_warehouse_name" },
@@ -141,8 +141,8 @@ export default {
       ],
       sendProductsHeaders: [
         { text: "Name", align: "start", value: "product_name" },
-        { text: "Requested Qty", value: "quantity" },
-        { text: "Sent Qty", value: "sent_quantity" },
+        { text: "Requested Qty", value: "quanunity" },
+        { text: "Sent Qty", value: "sent_quanunity" },
         { text: "status", value: "status" },
         { text: "Warehouse", value: "from_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
@@ -277,8 +277,8 @@ export default {
     acceptRecieveRequest(item) {
       this.seletedReceiveItems = [item];
       this.showAcceptListModal = true;
-      this.acceptRequest();
-      this.receiveRequests();
+      // this.acceptRequest();
+      // this.receiveRequests();
     },
     acceptRecieveProductsSingle(item){
       this.seletedReceiveProductsItems = [item]
@@ -289,6 +289,7 @@ export default {
       this.showRecieveProductsModal = true;
     },
     acceptRecieveProducts(){
+    
         var k = [];
       this.seletedReceiveProductsItems.forEach(function (item) {
         // eslint-disable-next-line no-console
@@ -297,7 +298,7 @@ export default {
    axios
         .request({
           method: "post",
-          url: this.$hostname + "warehouses/recieve-request",
+          url: this.$hostname + "warehouses/accept-recieve-requests",
           headers: {
             Authorization: "Bearer " + this.TOKEN,
           },
@@ -345,6 +346,11 @@ export default {
           this.seletedReceiveItems = [];
           this.getSupplyList();
           this.receiveRequests();
+        })    .catch((error) => {
+          // eslint-disable-next-line no-console
+          this.color = "warning";
+          this.snackbarText = error.response.data.error;
+          this.snackbar = true;
         });
     },
     editSentRequest() {
@@ -507,7 +513,7 @@ export default {
         })
         .then((response) => {
           this.pendingRequestList = response.data.filter((rqst) => {
-            return rqst.status == 1;
+            return (rqst.status == 1 || rqst.status == 4);
           });
 
           this.recieveProductList = response.data.filter((rqst) => {
@@ -537,7 +543,7 @@ export default {
         })
         .then((response) => {
           this.receiveRequestList = response.data.filter((x) => {
-            return x.status == 1;
+            return (x.status == 1 || x.status == 4);
           });
           this.sentProductsList = response.data.filter((x) => {
             return x.status == 2;
@@ -756,13 +762,9 @@ export default {
                 <template v-slot:[`item.status`]="{ item }">
                   <span
                     class="badge rounded-pill font-size-12"
-                    :class="
-                      item.status == 2
-                        ? 'badge-soft-success'
-                        : 'badge-soft-danger'
-                    "
+                    :class="item.status == 2 ? 'badge-soft-success' : item.status ==4?'badge-soft-warning':'badge-soft-danger' "
                   >
-                    {{ item.status == 1 ? "Pending" : "accepted" }}
+                    {{ item.status == 1 ? "Pending" : (item.status == 2?"accepted": "rejected") }}
                   </span>
                 </template>
                 <template  v-slot:[`item.actions`]="{ item }">
@@ -825,13 +827,10 @@ export default {
                 <template v-slot:[`item.status`]="{ item }">
                   <span
                     class="badge rounded-pill font-size-12"
-                    :class="
-                      item.status == 2
-                        ? 'badge-soft-success'
-                        : 'badge-soft-danger'
-                    "
+                   :class="item.status == 2 ? 'badge-soft-success' : item.status ==4?'badge-soft-warning':'badge-soft-danger' "
+
                   >
-                    {{ item.status == 1 ? "Pending" : "accepted" }}
+                    {{ item.status == 1 ? "Pending" : item.status == 1 ? "accepted":"rejected" }}
                   </span>
                 </template>
 
