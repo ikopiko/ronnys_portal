@@ -1128,10 +1128,43 @@ export default {
               :search="productSearch"
             >
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editProduct(item)">
-                  mdi-pencil
-                </v-icon>
-                <v-icon small @click="deleteProduct(item)"> mdi-delete </v-icon>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2">
+                          <v-icon small @click="editProduct(item)">
+                            mdi-pencil
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                   <span>Edit </span>
+                 </v-tooltip>
+                <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2">
+                          <v-icon small @click="deleteProduct(item)">
+                            mdi-delete
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>Delete </span>
+                  </v-tooltip>
+                                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2">
+                          <v-icon small @click="deleteProduct(item)">
+                            mdi-eye
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>View reciepe </span>
+                  </v-tooltip>
+              
               </template>
             </v-data-table>
           </v-expansion-panel-content>
