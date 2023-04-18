@@ -58,8 +58,11 @@ export default {
   },
   data() {
     return {
+      editItemRecipe: {},
+      recipeModal:false,
+      selectedItemRecipe: {},
       appendUnitTemp: '',
-      portionSize: 0,
+      portionSize: 1,
       productValues: [],
       typesList: [],
       isWarehouseEdited: false,
@@ -268,12 +271,40 @@ export default {
       this.editedWarehouseIndex = item.id;
       this.dialog = true;
     },
+
     editProduct(item) {
       // eslint-disable-next-line no-console
       console.log(item)
- 
+
+      var bodyFormData = new FormData();
+      bodyFormData.set("product_id", item.id);
+      axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/get-recipe",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+          data: bodyFormData,
+        })
+        .then((response) => {
+          this.editItemRecipe = response.data;
+          if(response.status === 200){
+            this.editItemRecipe.forEach(x => {
+              var temp = {};
+              temp.id = x.child_product_id;
+              temp.name = x.child_product_name;
+              temp.unit = x.unit;
+              temp.recipeAmount = x.qty;
+      
+              this.productValues.push(temp);
+              temp = {};
+            });
+          }
+        });
+
      
-     this.productName = item.name;
+      this.productName = item.name;
       this.productUnit = parseInt(1);
       this.productCategory = parseInt(item.products_category_id);
       this.productType = parseInt(item.category_id);
@@ -452,6 +483,40 @@ export default {
       this.productslist();
       this.closeDeleteProduct()
     },
+    viewRecipe(product){
+      this.selectedItemRecipe = product;
+      var bodyFormData = new FormData();
+      bodyFormData.set("product_id", product.id);
+      axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/get-recipe",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+          data: bodyFormData,
+        })
+        .then((response) => {
+          this.selectedItemRecipe.productRecipe = response.data;
+          this.recipeModal = true;
+        });
+    },
+    getRecipe(val) {
+      var bodyFormData = new FormData();
+      bodyFormData.set("product_id", val.id);
+      axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/get-recipe",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+          data: bodyFormData,
+        })
+        .then((response) => {
+          this.editItemRecipe = response.data;
+        });
+    },
     deleteUnitConfirm() {
         if (this.editedUnitIndex > 0) {
           var bodyFormDataNew = new FormData();
@@ -509,10 +574,18 @@ export default {
     },
     closeAddproduct() {
       this.showProductModal = false;
+      this.productName = "";
+      this.productUnit = "";
+      this.productCategory = "";
+      this.productType = "";
+      this.portionSize = 1;
       this.editedProductIndex = -1;
+      this.productValues = [];
      // this.$refs.productForm.reset();
     },
-
+    closeRecipe(){
+      this.recipeModal = false;
+    },
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
@@ -854,15 +927,27 @@ export default {
     saveProduct() {
       if (this.$refs.productForm.validate()) {
         if (this.editedProductIndex > 0) {
-          var bodyFormDataNew = new FormData();
-
-          bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
-          bodyFormDataNew.set("name", this.productName);
-          bodyFormDataNew.set("unit", this.productUnit);
-          bodyFormDataNew.set("category_id", this.productType);
-          bodyFormDataNew.set("products_category_id", this.productCategory);
-          bodyFormDataNew.set("status", 1);
-          bodyFormDataNew.set("portion_size", this.portionSize);
+          var recipe = [];
+          var tempObj = {};
+          if(this.productType == 2){
+            this.productValues.forEach(x => {
+              tempObj.product_id = x.id;
+              tempObj.qty = x.recipeAmount;
+              recipe.push(tempObj);
+              tempObj = {};
+            });
+          }
+          
+          // var bodyFormDataNew = new FormData();
+          // bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
+          // bodyFormDataNew.set("name", this.productName);
+          // bodyFormDataNew.set("unit", this.productUnit);
+          // bodyFormDataNew.set("category_id", this.productType);
+          // bodyFormDataNew.set("products_category_id", this.productCategory);
+          // bodyFormDataNew.set("status", 1);
+          // bodyFormDataNew.set("portion_size", this.portionSize);
+          // bodyFormDataNew.set("recipe", recipe);
+          
           
           axios
             .request({
@@ -871,7 +956,7 @@ export default {
               headers: {
                 Authorization: "Bearer " + this.TOKEN,
               },
-              data: bodyFormDataNew,
+              data: {"id": parseInt(this.editedProductIndex) , "status": 1 ,"portion_size": this.portionSize,"products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
             })
             .then((response) => {
               this.color = "success";
@@ -889,14 +974,14 @@ export default {
             });
         } else {
           // var bodyFormData = new FormData();
-          var recipe = [];
-          var tempObj = {};
+          var recipe2 = [];
+          var tempObj2 = {};
           if(this.productType == 2){
             this.productValues.forEach(x => {
-              tempObj.product_id = x.id;
-              tempObj.qty = x.recipeAmount;
-              recipe.push(tempObj);
-              tempObj = {};
+              tempObj2.product_id = x.id;
+              tempObj2.qty = x.recipeAmount;
+              recipe2.push(tempObj2);
+              tempObj2 = {};
             });
           }
           // bodyFormData.set("name", this.productName);
@@ -905,7 +990,6 @@ export default {
           // bodyFormData.set("category_id", this.productType);
           // bodyFormData.set("recipe", recipe);
 
-
           axios
             .request({
               method: "post",
@@ -913,7 +997,7 @@ export default {
               headers: {
                 Authorization: "Bearer " + this.TOKEN,
               },
-              data: {"portion_size": this.portionSize,"products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe },
+              data: {"portion_size": this.portionSize,"products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe2 },
             })
             .then((response) => {
             //  this.successmsg(response.data.data,"success")
@@ -1059,7 +1143,7 @@ export default {
                         <v-btn
                           elevation="0"
                           color="success"
-                          small
+                          x-small
                           @click="deleteItemConfirm"
                         >
                           <i class="bx bx-save"></i> Yes</v-btn
@@ -1067,7 +1151,7 @@ export default {
                         <v-btn
                           elevation="0"
                           color="error"
-                          small
+                          x-small
                           @click="closeDelete"
                         >
                           <i class="bx bx-x-circle"></i>Cancel</v-btn
@@ -1076,6 +1160,7 @@ export default {
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+
                 </v-toolbar>
               </template>
               <template v-slot:[`item.status_key`]="{ item }">
@@ -1127,11 +1212,24 @@ export default {
               :items-per-page="10"
               :search="productSearch"
             >
+            
               <template  v-slot:[`item.actions`]="{ item }">
+                <v-tooltip top v-if="item.category_id == 2">
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-bind="attrs" v-on="on">
+                        <v-btn icon x-small class="ma-2" color="green">
+                          <v-icon small @click="viewRecipe(item)">
+                            mdi-eye
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                    </template>
+                    <span>View reciepe </span>
+                  </v-tooltip>
                 <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2">
+                        <v-btn icon x-small class="ma-2" color="grey">
                           <v-icon small @click="editProduct(item)">
                             mdi-pencil
                           </v-icon>
@@ -1143,7 +1241,7 @@ export default {
                 <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2">
+                        <v-btn icon x-small class="ma-2" color="red">
                           <v-icon small @click="deleteProduct(item)">
                             mdi-delete
                           </v-icon>
@@ -1152,19 +1250,6 @@ export default {
                     </template>
                     <span>Delete </span>
                   </v-tooltip>
-                                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2">
-                          <v-icon small @click="deleteProduct(item)">
-                            mdi-eye
-                          </v-icon>
-                        </v-btn>
-                      </span>
-                    </template>
-                    <span>View reciepe </span>
-                  </v-tooltip>
-              
               </template>
             </v-data-table>
           </v-expansion-panel-content>
@@ -1258,7 +1343,7 @@ export default {
                         <v-btn
                           elevation="0"
                           color="success"
-                          small
+                          x-small
                           @click="deleteUnitConfirm"
                         >
                           <i class="bx bx-save"></i> Yes</v-btn
@@ -1388,7 +1473,7 @@ export default {
                         <v-btn
                           elevation="0"
                           color="success"
-                          small
+                          x-small
                           @click="deleteCatConfirm"
                         >
                           <i class="bx bx-save"></i> Yes</v-btn
@@ -1519,7 +1604,7 @@ export default {
                         <v-btn
                           elevation="0"
                           color="success"
-                          small
+                          x-small
                           @click="deleteTypeConfirm"
                         >
                           <i class="bx bx-save"></i> Yes</v-btn
@@ -1551,10 +1636,10 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
+                <!-- <v-icon small v-if="item.id != 2" @click="deleteType(item)"> mdi-delete </v-icon> -->
                 <v-icon small class="mr-2" @click="editType(item)">
                   mdi-pencil
                 </v-icon>
-                <v-icon small @click="deleteType(item)"> mdi-delete </v-icon>
               </template>
             </v-data-table>
           </v-expansion-panel-content>
@@ -1692,6 +1777,34 @@ export default {
           </v-card-actions>
         </v-card>
       </v-dialog>
+      
+      <v-dialog v-model="recipeModal" max-width="700" >
+          <v-card>
+            <v-card-title class="text-h5"
+              >{{ selectedItemRecipe.name }} Recipe per portion</v-card-title
+            >
+            <v-card-text>
+              <v-row>
+                <v-col cols="4" v-for="(recipeItem, index) in selectedItemRecipe.productRecipe" :key="index">
+                  {{ recipeItem.child_product_name }}: {{ recipeItem.qty }} {{ recipeItem.unit }}
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                elevation="0"
+                color="error"
+                small
+                @click="closeRecipe"
+              >
+                <i class="bx bx-x-circle"></i>Close</v-btn
+              >
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
        <v-dialog v-model="dialogDeleteProduct" max-width="500">
                     <v-card>
                       <v-card-title class="text-h5"
@@ -1703,15 +1816,15 @@ export default {
                         <v-btn
                           elevation="0"
                           color="success"
-                          small
+                          x-small
                           @click="deleteProductConfirm"
                         >
                           <i class="bx bx-save"></i> Yes</v-btn
                         >
                         <v-btn
-                          elevation="0"
+                          
                           color="error"
-                          small
+                          x-small
                           @click="closeDeleteProduct"
                         >
                           <i class="bx bx-x-circle"></i>Cancel</v-btn

@@ -135,7 +135,7 @@ export default {
         { text: "Name", align: "start", value: "product_name" },
         { text: "Requested Qty", value: "quanunity" },
         { text: "Sent Qty", value: "sent_quantity" },
-        { text: "status", value: "status" },
+        { text: "Status", value: "status" },
         { text: "Warehouse", value: "from_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
@@ -143,7 +143,7 @@ export default {
         { text: "Name", align: "start", value: "product_name" },
         { text: "Requested Qty", value: "quanunity" },
         { text: "Sent Qty", value: "sent_quanunity" },
-        { text: "status", value: "status" },
+        { text: "tatus", value: "status" },
         { text: "Warehouse", value: "from_warehouse_name" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],
@@ -827,7 +827,7 @@ export default {
                 <template v-slot:[`item.status`]="{ item }">
                   <span
                     class="badge rounded-pill font-size-12"
-                   :class="item.status == 2 ? 'badge-soft-success' : item.status ==4?'badge-soft-warning':'badge-soft-danger' "
+                   :class="item.status == 2 ? 'badge-soft-success' : item.status ==4 ? 'badge-soft-warning':'badge-soft-danger' "
 
                   >
                     {{ item.status == 1 ? "Pending" : item.status == 1 ? "accepted":"rejected" }}
@@ -836,7 +836,7 @@ export default {
 
                 <template  v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on, attrs }" v-if="item.status != 4">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon color="success">
                           <v-icon
@@ -852,7 +852,7 @@ export default {
                     <span>Accept Request</span>
                   </v-tooltip>
                   <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on, attrs }" v-if="item.status != 4">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small color="error">
                           <v-icon

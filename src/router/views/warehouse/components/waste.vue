@@ -69,7 +69,9 @@ export default {
           this.snackbarText = response.data.data;
           this.snackbar = true;
           this.responseData = response;
-          // this.closeModal();
+          this.wasteAmount = 0;
+          this.wasteComment = '';
+          this.closeModal();
         });
     },
   },
