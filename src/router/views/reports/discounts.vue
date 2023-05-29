@@ -141,11 +141,7 @@ export default {
       .request({
         method: "post",
         url:
-<<<<<<< HEAD
           "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/poses/order-statuses",
-=======
-          this.$hostname + "poses/order-statuses",
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         headers: {
           Authorization: "Bearer " + this.TOKEN
         },
@@ -203,10 +199,7 @@ export default {
         this.json_data = []; 
         this.supplyList = [];
 
-<<<<<<< HEAD
         this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/discounted-orders"
-=======
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         axios
           .request({
             method: "post",

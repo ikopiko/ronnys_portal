@@ -1,6 +1,8 @@
 <script>
 import axios from "axios";
 import Layout from "../../layouts/main";
+import DatePicker from "vue2-datepicker";
+import moment from "moment";
 
 
 //import Swal from "sweetalert2";
@@ -15,11 +17,19 @@ export default {
     title: "Waybill",
   },
   components: {
+      DatePicker,
     Layout,
   },
-  computed: {},
+  computed: {
+  
+
+  },
   data() {
     return {
+      waybillType:[],
+      isconfirmed:{0:"მისაღები",1:"მიღებული","-1":"უარყოფილი"},
+      lastday:new Date(),
+       date: [],
       loader:false,
       waybillModal:false,
       selectedItem: {},
@@ -36,9 +46,19 @@ export default {
       waybillGoodsList: [],
       waybillHeaders: [
         { text: "WAYBILL NUMBER", align: "start", value: "WAYBILL_NUMBER" },
+      { text: "STATUS", value: "STATUS" },
+
+     { text: "IS CONFIRMED", align: "start", value: "IS_CONFIRMED" },
+             { text: "TYPE", value: "TYPE" },
         { text: "SELLER_NAME", value: "SELLER_NAME" },
-        { text: "IS CONFIRMED", align: "start", value: "IS_CONFIRMED" },
+        { text: "AMOUNT", value: "FULL_AMOUNT" },
+        { text: "DRIVER", value: "DRIVER_NAME" },
+        { text: "CAR_NUMBER", value: "CAR_NUMBER" },
+        { text: "START_ADDRESS", value: "START_ADDRESS" },
+        { text: "END_ADDRESS", value: "END_ADDRESS" },
+      
         { text: "ACTIVATE_DATE", value: "ACTIVATE_DATE" },
+  { text: "WAYBILL_COMMENT", value: "WAYBILL_COMMENT" },
       
       ],
       waybillDetailHeader:[
@@ -53,12 +73,44 @@ export default {
   },
 
   mounted() {
+    this.lastday.setDate(this.lastday.getDate() -1)
+    this.date = [ moment(this.lastday).format("YYYY-MM-DD"),
+        moment(new Date()).format("YYYY-MM-DD"),]
+   ;
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
+    this.getwaybillTypes();
     this.getwaybillList();
+    
   },
   methods: {
+    getwaybillTypes(){
+      
+       axios
+        .request({
+          method: "post",
+          url: this.$hostname + "rs/get-waybill-types",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+        })
+        .then((response) => {
+
+        
+          response.data.forEach(x => {
+          
+              // eslint-disable-next-line no-console
+              this.waybillType[x.ID] = x.NAME          
+          });
+           // eslint-disable-next-line no-console
+           //console.log(this.waybillType)
+          // this.waybillList = response.data.filter((rqst) => {
+          //   return rqst.status == 1;
+          // });
+        });
+  
+    },
     // eslint-disable-next-line no-unused-vars
     rowClick(item, row) {
       // eslint-disable-next-line no-console
@@ -81,7 +133,7 @@ export default {
  
            this.waybillGoodsList = response.data.GOODS.length?response.data.GOODS:[response.data.GOODS];
            // eslint-disable-next-line no-console
-           console.log(response.data)
+           console.log(response)
           // this.waybillList = response.data.filter((rqst) => {
           //   return rqst.status == 1;
           // });
@@ -92,6 +144,7 @@ export default {
       this.loader = true
       var bodyFormData = new FormData();
       bodyFormData.set("warehouse_id", this.warehouseId);
+      bodyFormData.set("day", this.date);
       axios
         .request({
           method: "post",
@@ -107,9 +160,9 @@ export default {
           var temp2 = [];
 
           temp.forEach(x => {
-            if(x.IS_CONFIRMED == 0){
+          
               temp2.push(x);
-            }
+          
           });
            this.waybillList = temp2;
           // this.waybillList = response.data.filter((rqst) => {
@@ -124,6 +177,25 @@ export default {
 
 <template>
   <Layout>
+    <v-row>
+      <v-col cols="4" class="ml-2">
+            <date-picker
+              v-model="date"
+              type="date"
+              value-type="YYYY-MM-DD"
+              format="YYYY-MM-DD"
+              range
+              placeholder="Select date"
+              :rules="nameRules"
+            ></date-picker>
+          </v-col>
+          <v-col cols="2">
+            <v-btn color="primary" elevation="0" @click="getwaybillList()">
+              <v-icon small> mdi-magnify </v-icon>
+              Search
+            </v-btn>
+          </v-col>
+    </v-row>
     <v-card>
       <v-card-text>
         <v-card-title>
@@ -149,13 +221,21 @@ export default {
           :search="waybillSearch"
            @click:row="rowClick"
         >
+        <template v-slot:[`item.STATUS`]="{ item }">
+          {{item.STATUS==1?'აქტიური':'დასრულებული'}}
+        </template>
+        <template v-slot:[`item.IS_CONFIRMED`]="{ item }">
+          {{ isconfirmed[item.IS_CONFIRMED]}}
+        </template>
+             <template v-slot:[`item.TYPE`]="{ item }">
+          {{ waybillType[item.TYPE]}}
+        </template>
 
-        
         </v-data-table>
       </v-card-text>
     </v-card>
-
-        <v-dialog v-model="waybillModal" max-width="800">
+    
+    <v-dialog v-model="waybillModal" max-width="800">
       <v-card>
         <v-toolbar color="white" elevation="0">
           <span class="text-h6"> Waybill Detail</span>

@@ -112,10 +112,7 @@ export default {
         this.loader = true;
         this.json_data = this.supplyList = [];
 
-<<<<<<< HEAD
         this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/safe-detail"
-=======
->>>>>>> bbdecfe6c58eb64bf6d05bc7d57770825b4a129c
         axios
           .request({
             method: "post",
