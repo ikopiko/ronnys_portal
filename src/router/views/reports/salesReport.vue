@@ -119,7 +119,6 @@ export default {
               v-model="branch"
               :items="branchOptions"
               dense
-            
               label="Select branch"
             ></v-autocomplete>
           </v-col>

@@ -268,9 +268,15 @@ export default {
       this.dialog = true;
     },
     editProduct(item) {
+       const m = this.unitsList.filter((rqs) => {
+            return rqs.name == item.unit;
+          });
+  
+      
       this.productName = item.name;
-      this.productUnit = parseInt(item.unit);
-      this.productCategory = item.products_category_id;
+      this.productType = parseInt(item.category_id);
+      this.productUnit = parseInt(m.length>0?m[0].id:"");
+      this.productCategory = parseInt(item.products_category_id);
       this.editedProductIndex = item.id;
       this.showProductModal = true;
     },
@@ -279,6 +285,7 @@ export default {
       console.log(item)
       this.productName = item.name;
       this.productUnit = item.unit;
+      this.productType = parseInt(item.category_id);
       this.productCategory = parseInt(item.products_category_id);
       this.editedProductIndex = parseInt(item.id);
       this.dialogDeleteProduct = true;
@@ -308,11 +315,12 @@ export default {
     editCategory(item) {
       this.categoryName = item.name;
       this.selectedCategory = item.id;
-      this.typeStatus = item.status;
+      this.catStatus = item.status;
       this.editedCatIndex = item.id;
       this.dialogCategories = true;
     },
     editType(item) {
+  
       this.typeName = item.name;
       // this.selectedCategory = item.id;
       this.catStatus = item.status;
@@ -406,6 +414,7 @@ export default {
 
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
+          bodyFormDataNew.set("category_id", this.productType);
           bodyFormDataNew.set("unit", this.productUnit);
           bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 4);
@@ -839,8 +848,8 @@ export default {
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
           bodyFormDataNew.set("unit", this.productUnit);
-          bodyFormDataNew.set("category_id", this.productCategory);
-          bodyFormDataNew.set("products_category_id", this.productType);
+          bodyFormDataNew.set("category_id", this.productType);
+          bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 1);
           axios
             .request({
@@ -1068,7 +1077,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editItem(item)">
                   mdi-pencil
                 </v-icon>
@@ -1234,7 +1243,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editUnit(item)">
                   mdi-pencil
                 </v-icon>
@@ -1364,7 +1373,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editCategory(item)">
                   mdi-pencil
                 </v-icon>
@@ -1495,7 +1504,7 @@ export default {
                   {{ item.status_key }}
                 </span>
               </template>
-              <template c v-slot:[`item.actions`]="{ item }">
+              <template  v-slot:[`item.actions`]="{ item }">
                 <v-icon small class="mr-2" @click="editType(item)">
                   mdi-pencil
                 </v-icon>
