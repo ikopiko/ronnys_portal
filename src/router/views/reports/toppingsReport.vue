@@ -97,6 +97,7 @@ export default {
             },
             data: {
               date: this.date,
+              branch:this.branch
             },
           })
           .then((response) => {
@@ -135,7 +136,6 @@ export default {
               v-model="branch"
               :items="branchOptions"
               dense
-              :rules="nameRules"
               label="Select branch"
             ></v-autocomplete>
           </v-col>

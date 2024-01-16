@@ -42,6 +42,7 @@ export const menuItems = [
         icon: "bx-wallet-alt",
         link: "/reports/safe"
     },
+    
     {
         id: 14,
         label: "menuitems.closed.text",
@@ -53,6 +54,12 @@ export const menuItems = [
         label: "menuitems.invoice.text",
         icon: "bx-file",
         link: "/reports/invoices"
+    },
+    {
+        id: 35,
+        label: "menuitems.customer.text",
+        icon: "bx-user-circle",
+        link: "/customer"
     },
     {
         id: 16,
@@ -107,6 +114,13 @@ export const menuItems = [
         icon: "bx-cog",
         link: "/warehouse/setting"
     },
+    {
+        id: 21,
+        label: "menuitems.barcodes.text",
+        icon: "bx-barcode",
+        link: "/warehouse/barcodes"
+    },
+   
     // {
     //     id: 11111,
     //     label: "menuitems.setting.pay",

@@ -162,7 +162,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://new.ronnys.info/?r=v1/poses/order-statuses",
+          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/poses/order-statuses",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
@@ -286,7 +286,7 @@ export default {
         .request({
           method: "post",
           url:
-            "http://new.ronnys.info/?r=v1/orders/list-reporting",
+            "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },

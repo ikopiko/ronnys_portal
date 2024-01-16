@@ -273,6 +273,7 @@ export default {
     },
 
     editProduct(item) {
+<<<<<<< HEAD
       // eslint-disable-next-line no-console
       console.log(item)
 
@@ -308,6 +309,17 @@ export default {
       this.productUnit = parseInt(1);
       this.productCategory = parseInt(item.products_category_id);
       this.productType = parseInt(item.category_id);
+=======
+       const m = this.unitsList.filter((rqs) => {
+            return rqs.name == item.unit;
+          });
+  
+      
+      this.productName = item.name;
+      this.productType = parseInt(item.category_id);
+      this.productUnit = parseInt(m.length>0?m[0].id:"");
+      this.productCategory = parseInt(item.products_category_id);
+>>>>>>> 6fce65779e7e958b65fab9cc2716fda10f0812a8
       this.editedProductIndex = item.id;
       this.showProductModal = true;
     },
@@ -352,7 +364,11 @@ export default {
       this.dialogCategories = true;
     },
     editType(item) {
+<<<<<<< HEAD
       
+=======
+  
+>>>>>>> 6fce65779e7e958b65fab9cc2716fda10f0812a8
       this.typeName = item.name;
       // this.selectedCategory = item.id;
       this.catStatus = item.status;
@@ -449,6 +465,7 @@ export default {
 
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
           bodyFormDataNew.set("name", this.productName);
+          bodyFormDataNew.set("category_id", this.productType);
           bodyFormDataNew.set("unit", this.productUnit);
           bodyFormDataNew.set("category_id", this.productUnit);
           bodyFormDataNew.set("products_category_id", this.productCategory);
@@ -927,6 +944,7 @@ export default {
     saveProduct() {
       if (this.$refs.productForm.validate()) {
         if (this.editedProductIndex > 0) {
+<<<<<<< HEAD
           var recipe = [];
           var tempObj = {};
           if(this.productType == 2){
@@ -949,6 +967,16 @@ export default {
           // bodyFormDataNew.set("recipe", recipe);
           
           
+=======
+          var bodyFormDataNew = new FormData();
+
+          bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
+          bodyFormDataNew.set("name", this.productName);
+          bodyFormDataNew.set("unit", this.productUnit);
+          bodyFormDataNew.set("category_id", this.productType);
+          bodyFormDataNew.set("products_category_id", this.productCategory);
+          bodyFormDataNew.set("status", 1);
+>>>>>>> 6fce65779e7e958b65fab9cc2716fda10f0812a8
           axios
             .request({
               method: "post",
@@ -1636,7 +1664,10 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
+<<<<<<< HEAD
                 <!-- <v-icon small v-if="item.id != 2" @click="deleteType(item)"> mdi-delete </v-icon> -->
+=======
+>>>>>>> 6fce65779e7e958b65fab9cc2716fda10f0812a8
                 <v-icon small class="mr-2" @click="editType(item)">
                   mdi-pencil
                 </v-icon>

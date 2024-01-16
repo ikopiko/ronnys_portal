@@ -53,13 +53,13 @@ export default {
       branchURL: null,
       json_fields: {
         "Order ID": "id",
-        "Billing Name": "order_data.customer.name",
-        "Total price": "order_data.totalPrice",
-        "Type":"order_data.discountName",
-        "Amount": "order_data.newdiscount",
-        "Total due": "order_data.discounted",
-        "Comment":"order_data.managerComment",
-        "Method":"order_data.paymentType",
+        "Billing Name": "customer.name",
+        "Total price": "total_price",
+        "Type":"discountName",
+        "Amount": "newdiscount",
+        "Total due": "totalDue",
+        "Comment":"managerComment",
+        "Method":"paymentType",
         "Branch": "branch",
         "status": "statusName",
         "Date": "finish_date",
@@ -72,7 +72,7 @@ export default {
           sortable: true,
         },
         {
-          value: "order_data.customer.name",
+          value: "customer.name",
           text: "Billing Name",
           sortable: true,
         },
@@ -83,27 +83,27 @@ export default {
           sortable: true,
         },
         {
-          value: "order_data.totalPrice",
+          value: "total_price",
           text: "Total",
           sortable: true,
         },
         {
-          value: "order_data.discountName",
+          value: "discountName",
           text: "Type",
           sortable: true,
         },
         {
-          value: "order_data.newdiscount",
+          value: "newdiscount",
           text: "Amount",
           sortable: true,
         },
           {
-          value: "order_data.discounted",
+          value: "discounted",
           text: "Discounted",
           sortable: true,
         },
           {
-          value: "order_data.totalDue",
+          value: "totalDue",
           text: "Total Due",
           sortable: true,
         },
@@ -113,7 +113,7 @@ export default {
           sortable: true,
         },
           {
-          value: "order_data.paymentType",
+          value: "paymentType",
           text: "Method",
           sortable: true,
         },
@@ -141,7 +141,7 @@ export default {
       .request({
         method: "post",
         url:
-          this.$hostname + "poses/order-statuses",
+          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/poses/order-statuses",
         headers: {
           Authorization: "Bearer " + this.TOKEN
         },
@@ -170,25 +170,25 @@ export default {
     
     discount(item, ident){
         if(ident == "discname") {
-          if(item.order_data.discountName=="Diplomat")
+          if(item.discountName=="Diplomat")
             return '%'
-          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
+          else if(item.discountName=="Manager" && item.discountAmount == true)
           return "GEL"
           else return "%"
           } else if(ident == "discounted") {
-              if(item.order_data.discountName=="Diplomat")
-                 return (item.order_data.totalPrice - item.order_data.totalPrice / 1.18).toFixed(2)
-          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
-          return  item.order_data.discount;
+              if(item.discountName=="Diplomat")
+                 return (item.totalPrice - item.totalPrice / 1.18).toFixed(2)
+          else if(item.discountName=="Manager" && item.discountAmount == true)
+          return  item.discount;
           else 
-          return ((item.order_data.totalPrice / 100) * item.order_data.discount).toFixed(2)
+          return ((item.totalPrice / 100) * item.discount).toFixed(2)
           } else if(ident == "totalDue") {
-            if(item.order_data.discountName=="Diplomat")
-              return  (item.order_data.totalPrice-(item.order_data.totalPrice - item.order_data.totalPrice / 1.18)).toFixed(2);
-            else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
-            return (item.order_data.totalPrice - item.order_data.discount).toFixed(2)
+            if(item.discountName=="Diplomat")
+              return  (item.totalPrice-(item.totalPrice - item.totalPrice / 1.18)).toFixed(2);
+            else if(item.discountName=="Manager" && item.discountAmount == true)
+            return (item.totalPrice - item.discount).toFixed(2)
             else 
-          return  (item.order_data.totalPrice-((item.order_data.totalPrice / 100) * item.order_data.discount)).toFixed(2)
+          return  (item.totalPrice-((item.totalPrice / 100) * item.discount)).toFixed(2)
                 
           }
     },
@@ -199,6 +199,7 @@ export default {
         this.json_data = []; 
         this.supplyList = [];
 
+        this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/discounted-orders"
         axios
           .request({
             method: "post",
@@ -214,16 +215,15 @@ export default {
           .then((response) => {
             this.loader = false;
             // eslint-disable-next-line no-console
-            this.supplyList = this.json_data = response.data.data
+            this.supplyList = response.data.data
            
             this.supplyList.forEach((x) => {
-              x.order_data.newdiscount = x.order_data.discount+this.discount(x, "discname");
-              x.order_data.discounted = this.discount(x,"discounted");
-              x.order_data.totalDue = this.discount(x, "totalDue");
+               x.newdiscount = x.discount+this.discount(x, "discname");
+              x.discounted = (x.total_price-x.totalDue).toFixed(2);
               x.statusName =  this.orderStatuses[x.status-1].status_name 
             });
-            // eslint-disable-next-line no-console
-            console.log(this.supplyList)
+            this.json_data =  this.supplyList;
+          
           });
       }
     },

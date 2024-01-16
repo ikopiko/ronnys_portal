@@ -54,17 +54,17 @@ export default {
       branchURL: null,
       json_fields: {
         "Order ID": "id",
-        "delivery": "order_data.deliveryMethod",
-        "Customer Name": "order_data.customer.name",
-        "Total price": "order_data.totalPrice",
-        "Type":"order_data.discountName",
-        "Amount": "order_data.newdiscount",
-        "Split cash": "order_data.splitCash",
-        "Split card": "order_data.splitCard",
-        "Total due": "order_data.discounted",
+        "delivery": "deliveryMethod",
+        "Customer Name": "customer.name",
+        "Total price": "total_price",
+        "Type":"discountName",
+        "Amount": "newdiscount",
+        "Split cash": "splitCash",
+        "Split card": "splitCard",
+        "Total due": "totalDue",
         "Comment":"order_data.managerComment",
-        "Method":"order_data.paymentType",
-        "Wolt Code":"order_data.customer.code",
+        "Method":"paymentType",
+        "Wolt Code":"customer.code",
         "Branch": "branch",
         "status": "statusName",
         "Date": "finish_date",
@@ -77,32 +77,32 @@ export default {
           sortable: true,
         },
            {
-          value: "order_data.deliveryMethod",
+          value: "deliveryMethod",
           text: "Order Type",
           sortable: true,
         },
         {
-          value: "order_data.customer.code",
+          value: "customer.code",
           text: "Wolt Code",
           sortable: true,
         },
         {
-          value: "order_data.customer.name",
+          value: "customer.name",
           text: "Customer Name",
           sortable: true,
         },
-                {
+        {
           value: "status",
           text: "Status",
           sortable: true,
         },
         {
-          value: "order_data.totalPrice",
+          value: "total_price",
           text: "Total Price",
           sortable: true,
         },
         {
-          value: "order_data.totalDue",
+          value: "totalDue",
           text: "Total Due",
           sortable: true,
         },
@@ -150,40 +150,63 @@ export default {
   methods: {
     // eslint-disable-next-line no-unused-vars
     showDetail(item){
-      this.modalProductId = item.id
-      this.modalDiscType  = item.order_data.discountName
-      this.modalDisc = item.order_data.discount+this.discount(item,"discname")
-      this.modalCustomer =item.order_data.customer.name
-      // eslint-disable-next-line no-console
-      console.log(item.order_data.items)
-      this.order_data = item.order_data.items
-      this.modalTotalPrice = item.order_data.totalPrice
-      this.modalDiscount =  this.discount(item,"discounted")
-      this.modalTotalDue = this.discount(item,"totalDue")
-      this.detailModal = true
+
+
+        axios
+          .request({
+            method: "post",
+            url: this.$hostname + "orders/get-orderata-by-id-portal",
+            headers: {
+              Authorization: "Bearer " + this.TOKEN,
+            },
+            data: {
+              order_id: item.id,
+
+            },
+          })
+          .then((response) => {
+            // eslint-disable-next-line no-console
+            item = response.data.data
+           this.modalProductId = item.id
+            this.modalDiscType  = item.order_data.discountName
+            this.modalDisc = item.order_data.discount+this.discount(item,"discname")
+            this.modalCustomer =item.order_data.customer.name
+            this.order_data = item.order_data.items
+            this.modalTotalPrice = item.order_data.totalPrice
+            this.modalDiscount =  (item.total_price-item.totalDue).toFixed(2)
+            this.modalTotalDue = item.totalDue
+            this.detailModal = true
+            this.detailModal = true
+            });
+          
+   
+    
+
+
+    
     },
     
-    discount(item, ident){
+     discount(item, ident){
         if(ident == "discname") {
-          if(item.order_data.discountName=="Diplomat")
+          if(item.discountName=="Diplomat")
             return '%'
-          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
+          else if(item.discountName=="Manager" && item.discountAmount == true)
           return "GEL"
           else return "%"
           } else if(ident == "discounted") {
-              if(item.order_data.discountName=="Diplomat")
-                 return (item.order_data.totalPrice - item.order_data.totalPrice / 1.18).toFixed(2)
-          else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
-          return  item.order_data.discount;
+              if(item.discountName=="Diplomat")
+                 return (item.totalPrice - item.totalPrice / 1.18).toFixed(2)
+          else if(item.discountName=="Manager" && item.discountAmount == true)
+          return  item.discount;
           else 
-          return ((item.order_data.totalPrice / 100) * item.order_data.discount).toFixed(2)
+          return ((item.totalPrice / 100) * item.discount).toFixed(2)
           } else if(ident == "totalDue") {
-            if(item.order_data.discountName=="Diplomat")
-              return  (item.order_data.totalPrice-(item.order_data.totalPrice - item.order_data.totalPrice / 1.18)).toFixed(2);
-            else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
-            return (item.order_data.totalPrice - item.order_data.discount).toFixed(2)
+            if(item.discountName=="Diplomat")
+              return  (item.totalPrice-(item.totalPrice - item.totalPrice / 1.18)).toFixed(2);
+            else if(item.discountName=="Manager" && item.discountAmount == true)
+            return (item.totalPrice - item.discount).toFixed(2)
             else 
-          return  (item.order_data.totalPrice-((item.order_data.totalPrice / 100) * item.order_data.discount)).toFixed(2)
+          return  (item.totalPrice-((item.totalPrice / 100) * item.discount)).toFixed(2)
                 
           }
     },
@@ -194,6 +217,7 @@ export default {
         this.json_data = []; 
         this.supplyList = [];
 
+        this.branchURL = "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/list-reporting"
         // this.branchURL = "http://new.ronnys.info/?r=v1/reporting/list-reporting"
         axios
           .request({
@@ -214,10 +238,9 @@ export default {
             this.supplyList = this.json_data = response.data.data
            
             this.supplyList.forEach((x) => {
-              x.order_data.paymentType = x.order_data.paymentType+"  "+(x.opay_status != null ?x.opay_status:"");
-              x.order_data.newdiscount = x.order_data.discount+this.discount(x, "discname");
-              x.order_data.discounted = this.discount(x,"discounted");
-              x.order_data.totalDue = this.discount(x, "totalDue");
+              x.newdiscount = x.discount+this.discount(x, "discname");
+              x.paymentType = x.paymentType+"  "+(x.opay_status != null ?x.opay_status:
+              x.source=="web"?"Success":"");
               x.statusName =  this.orderStatuses[x.status-1].status_name 
             });
           

@@ -268,7 +268,7 @@ export default {
         .request({
           method: "post",
           url:
-            "http://new.ronnys.info/?r=v1/reporting/get-close-day",
+            "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/get-close-day",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },

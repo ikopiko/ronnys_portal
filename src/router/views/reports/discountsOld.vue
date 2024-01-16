@@ -211,7 +211,7 @@ export default {
         .request({
           method: "post",
           url:
-            "http://new.ronnys.info/?r=v1/manager/discounted-orders",
+            "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/manager/discounted-orders",
           headers: {
             Authorization: "Bearer " + TOKEN,
           },

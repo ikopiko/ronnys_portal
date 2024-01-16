@@ -113,6 +113,18 @@ export default [
     component: () => import('./views/warehouse/warehouse')
   },
   {
+    path: '/customer',
+    name: 'Customer',
+    meta: { authRequired: true },
+    component: () => import('./views/customer/index')
+  },
+  {
+    path: '/warehouse/barcodes',
+    name: 'barcodes',
+    meta: { authRequired: true },
+    component: () => import('./views/warehouse/barcodes')
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('./views/account/login'),

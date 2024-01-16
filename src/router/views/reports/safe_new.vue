@@ -117,7 +117,7 @@ export default {
       toDate: null,
       branch: null,
       selectedBranch: null,
-      branchURL: "http://new.ronnys.info/?r=v1/reporting/safe-detail",
+      branchURL: "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/reporting/safe-detail",
       modalItem: {},
       modalShow: false,
       showAlert: false,
