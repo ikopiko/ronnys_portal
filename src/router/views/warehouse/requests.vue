@@ -790,7 +790,7 @@ export default {
                     {{ item.status == 1 ? "Pending" : "accepted" }}
                   </span>
                 </template>
-                <template c v-slot:[`item.actions`]="{ item }">
+                <template  v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
@@ -860,7 +860,7 @@ export default {
                   </span>
                 </template>
 
-                <template c v-slot:[`item.actions`]="{ item }">
+                <template v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
@@ -954,7 +954,7 @@ export default {
                   </span>
                 </template>
 
-                <template c v-slot:[`item.actions`]="{ item }">
+                <template  v-slot:[`item.actions`]="{ item }">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
