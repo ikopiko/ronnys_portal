@@ -162,6 +162,14 @@ export default {
     this.receiveRequests();
   },
   methods: {
+    testing(){
+
+       this.productRecipe.forEach((x) => {
+    
+            x.batchAmount =this.portionQty*x.qty;
+       
+          });
+    },
     selectSupplie(item) {
       const m = this.supplyList.filter((rqs) => {
             return rqs.product_id == item;
@@ -407,7 +415,7 @@ export default {
           });
           this.supplyQty = this.portionQty;
         } else {
-          this.supplyItems = {};
+          this.supplyItems = [];
         }
 
         axios
@@ -432,7 +440,13 @@ export default {
             this.clearSupplyForm();
             this.clearSemiForm();
             this.getSupplyList();
-          });
+          })
+           .catch((error) => {
+          // eslint-disable-next-line no-console
+          this.color = "warning";
+          this.snackbarText = error.response.data.error;
+          this.snackbar = true;
+        });
       }
     },
     clearSupplyForm() {
@@ -1033,6 +1047,7 @@ export default {
                 <v-text-field
                   v-if="semiSelected"
                   dense
+                  @input="testing()"
                   v-model="portionQty"
                   :rules="[(v) => !!v || 'Portion quantity is required']"
                   label="Portion quantity"
@@ -1074,7 +1089,7 @@ export default {
 
                 <div>
                   Amount By Repice:
-                  {{ pv.qty * portionQty + " " + pv.unit.toUpperCase() }}
+                  {{pv.qty * portionQty + " " + pv.unit.toUpperCase() }}
                 </div>
               </v-col>
             </v-row>
