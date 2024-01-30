@@ -274,9 +274,8 @@ export default {
 
     editProduct(item) {
        const m = this.unitsList.filter((rqs) => {
-            return rqs.name == item.unit;
-          });
-  
+        return rqs.name == item.unit;
+      });
       
       this.productName = item.name;
       this.productType = parseInt(item.category_id);
@@ -903,6 +902,41 @@ export default {
     saveProduct() {
       if (this.$refs.productForm.validate()) {
         if (this.editedProductIndex > 0) {
+          if(this.productType == 2) {
+            var recipe3 = [];
+            var tempObj3 = {};
+            this.productValues.forEach(x => {
+              tempObj3.product_id = x.id;
+              tempObj3.qty = x.recipeAmount;
+              recipe3.push(tempObj3);
+              tempObj3 = {};
+            });
+
+            axios
+            .request({
+              method: "post",
+              url: this.$hostname + "warehouses/product-create",
+              headers: {
+                Authorization: "Bearer " + this.TOKEN,
+              },
+              data: {"id": parseInt(this.editedProductIndex), "portion_size": this.portionSize,"products_category_id": this.productCategory, 'category_id': this.productType, 'name': this.productName, 'unit': this.productUnit, 'recipe': recipe3 },
+            })
+            .then((response) => {
+            //  this.successmsg(response.data.data,"success")
+              this.closeAddproduct();
+              this.productslist();
+              this.color = "success";
+              this.snackbarText = response.data.data;
+              this.snackbar = true;
+            })
+            .catch((error) => {
+              this.color = "warning";
+              this.snackbarText = error.response.data.error;
+              this.snackbar = true;
+            });
+
+          } else {
+
           var bodyFormDataNew = new FormData();
 
           bodyFormDataNew.set("id", parseInt(this.editedProductIndex));
@@ -911,6 +945,7 @@ export default {
           bodyFormDataNew.set("category_id", this.productType);
           bodyFormDataNew.set("products_category_id", this.productCategory);
           bodyFormDataNew.set("status", 1);
+          // alert('BLA');
           axios
             .request({
               method: "post",
@@ -926,6 +961,7 @@ export default {
               this.snackbar = true;
               this.closeAddproduct();
               this.productslist();
+              
               //  this.successmsg(response.data, "success");
             })
             .catch((error) => {
@@ -934,6 +970,7 @@ export default {
               this.snackbarText = error.response.data.error;
               this.snackbar = true;
             });
+          }
         } else {
           // var bodyFormData = new FormData();
           var recipe2 = [];
