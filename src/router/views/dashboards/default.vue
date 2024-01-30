@@ -49,6 +49,7 @@ export default {
       status: "1,2,3,4,5,6,7,8,9,10",
       ordersList: [],
       branchInfo: [],
+      
     };
   },
   mounted() {
@@ -58,128 +59,17 @@ export default {
 
     const TOKEN = this.loggedUser.token;
 
-    var day = this.date + ' to ' + this.date;
-    var bodyUpdateSaburtalo = new FormData();
-    bodyUpdateSaburtalo.set("day", day);
-    bodyUpdateSaburtalo.set("status_key", this.status);
-    bodyUpdateSaburtalo.set("branch", "saburtalo");
-
+   
     axios
       .request({
         method: "post",
-        url:
-          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
+        url: this.$hostname + "orders/sales-report-by-branch",
         headers: {
           Authorization: "Bearer " + TOKEN,
         },
-        data: bodyUpdateSaburtalo,
       })
       .then((response) => {
-        this.ordersList = response.data.data;
-        var orderCount = 0;
-        var orderSum = 0;
-        this.ordersList.forEach( x => {
-          orderCount++;
-          orderSum = orderSum + Number(x.order_data.totalPrice);
-        })
-        var saburtalo = {
-          name: 'Saburtalo',
-          orders:  orderCount,
-          sum: orderSum,
-          icon: "bx bx-bar-chart-alt-2",
-        };
-        this.branchInfo.push(saburtalo);
-      });
- 
-     var bodyUpdateVake = new FormData();
-    bodyUpdateVake.set("day", day);
-    bodyUpdateVake.set("status_key", this.status);
-    bodyUpdateVake.set("branch", "vake");
-    axios
-      .request({
-        method: "post",
-        url:
-          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-        headers: {
-          Authorization: "Bearer " + TOKEN,
-        },
-        data: bodyUpdateVake,
-      })
-      .then((response) => {
-        this.ordersList = response.data.data;
-        var orderCount = 0;
-        var orderSum = 0;
-        this.ordersList.forEach( x => {
-          orderCount++;
-          orderSum = orderSum + Number(x.order_data.totalPrice);
-        })
-        var saburtalo = {
-          name: 'Vake',
-          orders:  orderCount,
-          sum: orderSum,
-          icon: "bx bx-bar-chart-alt-2",
-        };
-        this.branchInfo.push(saburtalo);
-      });
-     var bodyUpdateDigomi = new FormData();
-    bodyUpdateDigomi.set("day", day);
-    bodyUpdateDigomi.set("status_key", this.status);
-    bodyUpdateDigomi.set("branch", "digomi");
-    axios
-      .request({
-        method: "post",
-        url:
-          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-        headers: {
-          Authorization: "Bearer " + TOKEN,
-        },
-        data: bodyUpdateDigomi,
-      })
-      .then((response) => {
-        this.ordersList = response.data.data;
-        var orderCount = 0;
-        var orderSum = 0;
-        this.ordersList.forEach( x => {
-          orderCount++;
-          orderSum = orderSum + Number(x.order_data.totalPrice);
-        })
-        var saburtalo = {
-          name: 'Digomi',
-          orders:  orderCount,
-          sum: orderSum,
-          icon: "bx bx-bar-chart-alt-2",
-        };
-        this.branchInfo.push(saburtalo);
-      });
-    var bodyUpdateGldani = new FormData();
-    bodyUpdateGldani.set("day", day);
-    bodyUpdateGldani.set("status_key", this.status);
-    bodyUpdateGldani.set("branch", "gldani");
-    axios
-      .request({
-        method: "post",
-        url:
-          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/orders/list-reporting",
-        headers: {
-          Authorization: "Bearer " + TOKEN,
-        },
-        data: bodyUpdateGldani,
-      })
-      .then((response) => {
-        this.ordersList = response.data.data;
-        var orderCount = 0;
-        var orderSum = 0;
-        this.ordersList.forEach( x => {
-          orderCount++;
-          orderSum = orderSum + Number(x.order_data.totalPrice);
-        })
-        var saburtalo = {
-          name: 'Gldani',
-          orders:  orderCount,
-          sum: orderSum,
-          icon: "bx bx-bar-chart-alt-2",
-        };
-        this.branchInfo.push(saburtalo);
+        this.branchInfo = response.data.data;
       });
   },
   methods: {
@@ -205,8 +95,8 @@ export default {
     <PageHeader :title="title" :items="items" />
      
       <div class="row">
-        <div v-for="stat of branchInfo" :key="stat.name" class="col-3">
-          <Stat :icon="stat.icon" :name="stat.name" :orders="stat.orders" :sum="stat.sum" />
+        <div v-for="(stat, index) of branchInfo" :key="index" class="col-3">
+          <Stat :icon="stat.icon" :name="stat.branch" :orders="stat.count" :sum="stat.total" />
         </div>
       </div>
   </Layout>

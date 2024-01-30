@@ -294,14 +294,8 @@ export default {
       this.seletedReceiveProductsItems = [item];
       this.showRecieveProductsModal = true;
     },
-<<<<<<< HEAD
-    acceptRecieveProducts(){
-    
-        var k = [];
-=======
     acceptRecieveProducts() {
       var k = [];
->>>>>>> 6fce65779e7e958b65fab9cc2716fda10f0812a8
       this.seletedReceiveProductsItems.forEach(function (item) {
         // eslint-disable-next-line no-console
         k.push({ id: item.id, quantity: item.quantity });

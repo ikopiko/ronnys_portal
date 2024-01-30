@@ -29,14 +29,14 @@ export default {
     <div class="card-body">
       <div class="media">
         <div class="media-body">
-          <p class="text-muted fw-medium mb-2">{{ name }}</p>
+          <p class="text-muted fw-medium mb-2">{{ name.toUpperCase() }}</p>
           <h4 class="mb-0">{{ orders }} Orders</h4>
-          <h4 class="mb-0">{{ sum.toFixed(2) }} GEL</h4>
+          <h4 class="mb-0">{{ Number(sum).toFixed(2) }} GEL</h4>
         </div>
 
         <div class="avatar-sm align-self-center mini-stat-icon rounded-circle bg-primary">
           <span class="avatar-title">
-            <i :class="`${icon} font-size-24`"></i>
+            <i class="bx bx-bar-chart-alt-2 font-size-24`"></i>
           </span>
         </div>
       </div>
