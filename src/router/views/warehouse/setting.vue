@@ -641,6 +641,7 @@ export default {
                 id: parseInt(this.editedWarehouseIndex),
                 name: this.name,
                 branch_id: parseInt(this.select),
+                status: 1,
               },
             })
             .then((response) => {
@@ -748,6 +749,9 @@ export default {
         .request({
           method: "post",
           url: this.$hostname + "warehouses/warehouse-list",
+          data: {
+            status:true
+          },
           headers: {
             Authorization: "Bearer " + this.TOKEN,
           },
@@ -792,39 +796,38 @@ export default {
         } 
         else {
           axios
-              .request({
-                method: "post",
-                url: this.$hostname + "warehouses/create-category",
-                headers: {
-                  Authorization: "Bearer " + this.TOKEN,
-                },
-                data: {
-                  id: '',
-                  name: this.typeName,
-                  status: '',
-                },
-              })
-              .then((response) => {
-                this.color = "success";
-                this.snackbarText = response.data.data;
-                this.snackbar = true;
-                this.closeType();
-                this.getTypes();
-                this.productslist();
-                //  this.successmsg(response.data, "success");
-              })
-              .catch((error) => {
-                // eslint-disable-next-line no-console
-                this.color = "warning";
-                this.snackbarText = error.response.data.error;
-                this.snackbar = true;
-                this.closeType();
-              });
+            .request({
+              method: "post",
+              url: this.$hostname + "warehouses/create-category",
+              headers: {
+                Authorization: "Bearer " + this.TOKEN,
+              },
+              data: {
+                id: '',
+                name: this.typeName,
+                status: '',
+              },
+            })
+            .then((response) => {
+              this.color = "success";
+              this.snackbarText = response.data.data;
+              this.snackbar = true;
+              this.closeType();
+              this.getTypes();
+              this.productslist();
+              //  this.successmsg(response.data, "success");
+            })
+            .catch((error) => {
+              // eslint-disable-next-line no-console
+              this.color = "warning";
+              this.snackbarText = error.response.data.error;
+              this.snackbar = true;
+              this.closeType();
+            });
         }
         this.editedTypeIndex = -1
-         this.typeName = ""
-          this.catStatus  = -1
-
+        this.typeName = ""
+        this.catStatus  = -1
       }
     },
     saveCategory() {
