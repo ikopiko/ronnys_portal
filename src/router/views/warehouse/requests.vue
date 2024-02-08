@@ -1078,16 +1078,17 @@ export default {
               >
               <v-col cols="3" v-for="pv in productRecipe" :key="pv.id">
                 <v-text-field
-                  class=""
+                  
                   clearable
                   dense
+                  
                   v-model="pv.batchAmount"
                   :rules="[(v) => !!v || 'Supply is required']"
                   :append-icon="pv.unit"
                   :label="'Enter ' + pv.child_product_name + ' quantity'"
                 ></v-text-field>
 
-                <div>
+                <div style="font-size:12px">
                   Amount By Repice:
                   {{pv.qty * portionQty + " " + pv.unit.toUpperCase() }}
                 </div>

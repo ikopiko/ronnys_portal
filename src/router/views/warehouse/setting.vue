@@ -273,7 +273,10 @@ export default {
     },
 
     editProduct(item) {
-       const m = this.unitsList.filter((rqs) => {
+      if(item.category_id ==2) {
+        this.getRecipe(item)
+      }
+      const m = this.unitsList.filter((rqs) => {
         return rqs.name == item.unit;
       });
       
@@ -488,7 +491,7 @@ export default {
           data: bodyFormData,
         })
         .then((response) => {
-          this.editItemRecipe = response.data;
+          this.productValues = response.data;
         });
     },
     deleteUnitConfirm() {
