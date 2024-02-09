@@ -105,6 +105,9 @@ export default {
       editedTypeIndex: -1, 
       editedProductIndex: -1,
       productSearch: "",
+      editedItemRecipe: {
+
+      },
       editedItem: {
         name: "",
         calories: 0,
@@ -279,6 +282,10 @@ export default {
       
       this.productName = item.name;
       this.productType = parseInt(item.category_id);
+
+      if(this.productType == 2) {
+        this.getRecipe(item);
+      }
       this.productUnit = parseInt(m.length>0?m[0].id:"");
       this.productCategory = parseInt(item.products_category_id);
       this.editedProductIndex = item.id;
@@ -488,7 +495,18 @@ export default {
           data: bodyFormData,
         })
         .then((response) => {
-          this.editItemRecipe = response.data;
+          this.editedItemRecipe = response.data;
+
+          this.editedItemRecipe.forEach(x => {
+            var obj = {
+              name: x.child_product_name,
+              id: x.child_product_id,
+              unit: x.unit,
+              recipeAmount: x.qty
+            };
+            this.productValues.push(obj);
+          })
+          // this.productValues = response.data;
         });
     },
     deleteUnitConfirm() {
@@ -1727,7 +1745,7 @@ export default {
                   clearable
                   dense
                   v-model="portionSize"
-                  :append-icon="appendUnitTemp"
+                  :append-icon="appendUnitTemp.charAt()"
                   :label="'Enter Portion Size'"
                 ></v-text-field>
             </v-col>
@@ -1739,7 +1757,7 @@ export default {
                     clearable
                     dense
                     v-model="pv.recipeAmount"
-                    :append-icon="pv.unit"
+                    :append-icon="pv.unit.charAt()"
                     :label="'Enter ' + pv.name + ' quantity'"
                   ></v-text-field>
                 </v-col>
