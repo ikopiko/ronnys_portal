@@ -1,3 +1,181 @@
+<script>
+import axios from "axios";
+export default {
+  props: {
+    token: {
+      type: String,
+    },
+    product: {
+      type: Object,
+    },
+    method: { type: Function },
+  },
+
+  data() {
+    
+    return {
+      deleteItemDialog: false,
+      tempQty: '',
+      tempItem: {},
+      supplyItems: [],
+      dataHeaders: [
+        { text: "Name", align: "start", value: "product_name" },
+        { text: "From Warehouse", value: "from_warehouse_name" },
+        { text: "To Warehouse", value: "to_warehouse_name" },
+        { text: "Quantity", value: "quantity" },
+        { text: "Unit", value: "unit" },
+        { text: "Overspent", value: "overspent" },
+        { text: "Action", value: "action" },
+        { text: "Actions", value: "actions", sortable: false, align: "end" },
+      ],
+      dataSearch: '',
+      semiActive: false,
+      selectedItem: {},
+      responseData: [],
+      snackbar: false,
+      color: "default",
+      snackbarText: null,
+      semiItems: [],
+      modal: false,
+    };
+  },
+  watch:{
+    product(val){
+        this.getData(val.product_id);
+    },
+  },
+  mounted() {
+    this.getData(this.product.product_id);
+  },
+  methods: {
+    editSupply(item){
+        this.getSemiItems(item);
+        this.tempQty = item.quantity;
+        this.tempItem = item;
+    },
+    supplyDone(){
+      if(this.tempItem.products_category_id == 2){
+          this.semiItems.forEach(x => {
+            var temp_obj = {};
+
+              temp_obj.product_id = x.id;
+              temp_obj.quantity = x.batchQuantity;
+              temp_obj.default_quantity = x.quantity * this.tempQty;
+
+            this.supplyItems.push(temp_obj);
+            this.temp_obj = {};
+          })
+          this.supplyQty = this.portionQty;
+        } else {
+          this.supplyItems = {};
+        }
+        axios
+          .request({
+            method: "post",
+            url: this.$hostname + "warehouses/update-supply",
+            headers: {
+              Authorization: "Bearer " + this.token,
+            },
+            data: {
+              supply_id: this.tempItem.supplie_id,
+              action: 'update',
+              quantity: this.supplyQty,
+              items : this.supplyItems
+            },
+          })
+          .then((response) => {
+            this.supplyModal = false;
+            this.color = "success";
+            this.snackbarText = response.data.data;
+            this.snackbar = true;
+            this.getData(this.product.product_id);
+          });
+    },
+    deleteSupply(item){
+      this.tempItem = item;
+      this.deleteItemDialog = true;
+    },
+    confirmDeleteSupply(){
+      axios
+        .request({
+        method: "post",
+        url: this.$hostname + "warehouses/update-supply",
+        headers: {
+          Authorization: "Bearer " + this.token,
+        },
+        data: {
+          supply_id: this.tempItem.supplie_id,
+          action: 'delete',
+          quantity: this.supplyQty,
+          items : {}
+        },
+      })
+      .then((response) => {
+        this.deleteItemDialog = false;
+        this.color = "success";
+        this.snackbarText = response.data.data;
+        this.snackbar = true;
+        this.getData(this.product.product_id);
+      });
+    },
+    getData(id){
+        axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/supplies-detail",
+          headers: {
+            Authorization: "Bearer " + this.token,
+          },
+          data: {
+            product_id: id
+          },
+        })
+        .then((response) => {
+          this.responseData = response.data
+
+          this.responseData.forEach(x => {
+            x.unit = this.product.unit;
+          });
+        });
+    },
+    getSemiItems(item){
+        axios
+        .request({
+          method: "post",
+          url: this.$hostname + "warehouses/semifinished-supplies-detail",
+          headers: {
+            Authorization: "Bearer " + this.token,
+          },
+          data: {
+            id: item.id
+          },
+        })
+        .then((response) => {
+          this.semiItems = response.data;
+          this.semiActive = true;
+        });
+    },
+    isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+        evt.preventDefault();         
+        } else {
+            var temp = this.wasteAmount + evt.key;
+            if(Number(temp) <= Number(this.product.quantity)){
+                return true;
+            } else {
+                evt.preventDefault();
+            }
+        }        
+    },
+    closeModal(){
+      this.semiActive = false;
+      this.$emit('closeModal');
+    },
+  },
+};
+</script>
 <template>
     <div>
       <v-snackbar v-model="snackbar" :color="color" elevation="5">
@@ -142,24 +320,26 @@
         v-model="deleteItemDialog"
         width="400px"
       >
-        <v-card>
+        <v-card  >
           <v-card-title>
             <span>Are you sure to delete supply?</span>
           </v-card-title>
-          <v-card-actions>
+          
+          <v-card-actions class="justify-center">
             <v-btn
-              color="primary"
+              color="success"
               variant="text"
-              @click="confirmDeleteSupply"
-            >
-              Confirm
+              class="text-capitalize"
+              @click="confirmDeleteSupply" small>
+               <i class="bx bx-check"></i> Confirm
             </v-btn>
             <v-btn
+            class="text-capitalize"
               color="error"
               variant="text"
-              @click="deleteItemDialog = false"
+              @click="deleteItemDialog = false" small
             >
-              Cancel
+             <i class="bx bx-x-circle"></i>  Cancel
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -172,181 +352,3 @@
     font-size: 16px;
   }
   </style>
-
-
-<script>
-import axios from "axios";
-export default {
-  props: {
-    token: {
-      type: String,
-    },
-    product: {
-      type: Object,
-    },
-    method: { type: Function },
-  },
-
-  data() {
-    return {
-      deleteItemDialog: false,
-      tempQty: '',
-      tempItem: {},
-      supplyItems: [],
-      dataHeaders: [
-        { text: "Name", align: "start", value: "product_name" },
-        { text: "From Warehouse", value: "from_warehouse_name" },
-        { text: "To Warehouse", value: "to_warehouse_name" },
-        { text: "Quantity", value: "quantity" },
-        { text: "Unit", value: "unit" },
-        { text: "Overspent", value: "overspent" },
-        { text: "Actions", value: "actions", sortable: false, align: "end" },
-      ],
-      dataSearch: '',
-      semiActive: false,
-      selectedItem: {},
-      responseData: [],
-      snackbar: false,
-      color: "default",
-      snackbarText: null,
-      semiItems: [],
-      modal: false,
-    };
-  },
-  watch:{
-    product(val){
-        this.getData(val.product_id);
-    },
-  },
-  mounted() {
-    this.getData(this.product.product_id);
-  },
-  methods: {
-    editSupply(item){
-        this.getSemiItems(item);
-        this.tempQty = item.quantity;
-        this.tempItem = item;
-    },
-    supplyDone(){
-      if(this.tempItem.products_category_id == 2){
-          this.semiItems.forEach(x => {
-            var temp_obj = {};
-
-              temp_obj.product_id = x.id;
-              temp_obj.quantity = x.batchQuantity;
-              temp_obj.default_quantity = x.quantity * this.tempQty;
-
-            this.supplyItems.push(temp_obj);
-            this.temp_obj = {};
-          })
-          this.supplyQty = this.portionQty;
-        } else {
-          this.supplyItems = {};
-        }
-        axios
-          .request({
-            method: "post",
-            url: this.$hostname + "warehouses/update-supply",
-            headers: {
-              Authorization: "Bearer " + this.TOKEN,
-            },
-            data: {
-              supply_id: this.tempItem.supplie_id,
-              action: 'update',
-              quantity: this.supplyQty,
-              items : this.supplyItems
-            },
-          })
-          .then((response) => {
-            this.supplyModal = false;
-            this.color = "success";
-            this.snackbarText = response.data.data;
-            this.snackbar = true;
-            this.getData(this.product.product_id);
-          });
-    },
-    deleteSupply(item){
-      this.tempItem = item;
-      this.deleteItemDialog = true;
-    },
-    confirmDeleteSupply(){
-      axios
-        .request({
-        method: "post",
-        url: this.$hostname + "warehouses/update-supply",
-        headers: {
-          Authorization: "Bearer " + this.TOKEN,
-        },
-        data: {
-          supply_id: this.tempItem.supplie_id,
-          action: 'delete',
-          quantity: this.supplyQty,
-          items : {}
-        },
-      })
-      .then((response) => {
-        this.deleteItemDialog = false;
-        this.color = "success";
-        this.snackbarText = response.data.data;
-        this.snackbar = true;
-        this.getData(this.product.product_id);
-      });
-    },
-    getData(id){
-        axios
-        .request({
-          method: "post",
-          url: this.$hostname + "warehouses/supplies-detail",
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-          data: {
-            product_id: id
-          },
-        })
-        .then((response) => {
-          this.responseData = response.data
-
-          this.responseData.forEach(x => {
-            x.unit = this.product.unit;
-          });
-        });
-    },
-    getSemiItems(item){
-        axios
-        .request({
-          method: "post",
-          url: this.$hostname + "warehouses/semifinished-supplies-detail",
-          headers: {
-            Authorization: "Bearer " + this.token,
-          },
-          data: {
-            id: item.id
-          },
-        })
-        .then((response) => {
-          this.semiItems = response.data;
-          this.semiActive = true;
-        });
-    },
-    isNumber(evt) {
-        evt = (evt) ? evt : window.event;
-        var charCode = (evt.which) ? evt.which : evt.keyCode;
-        if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-        evt.preventDefault();         
-        } else {
-            var temp = this.wasteAmount + evt.key;
-            if(Number(temp) <= Number(this.product.quantity)){
-                return true;
-            } else {
-                evt.preventDefault();
-            }
-        }        
-    },
-    closeModal(){
-      this.semiActive = false;
-      this.$emit('closeModal');
-    },
-  },
-};
-</script>

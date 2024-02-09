@@ -153,7 +153,10 @@ export default {
     this.getReport()
   },
   methods: {
-    // eslint-disable-next-line no-unused-vars
+         sumField(key) {
+        const sum =  this.supplyList.reduce((a, b) => a*1 + (b[key]*1 || 0), 0)
+        return sum.toFixed(2)
+    },
     showDetail(item){
       this.modalProductId = item.id
       this.modalDiscType  = item.order_data.discountName
@@ -331,6 +334,23 @@ export default {
               
               
             </template>
+            <template slot="body.append">
+                    <tr class="text-secondary bg-light">
+                        <th class="">Totals</th>
+                        <th class="title"></th>
+                        <th class="title"></th>
+                        <th class="">{{sumField('total_price')}}</th>
+                        <th class="title"></th>
+                         <th class="title"></th>
+                        <th class="">{{ sumField('discounted') }}</th>
+                        <th class="">{{ sumField('totalDue') }}</th>
+                      
+                        <th class="title"></th>
+                        <th class="title"></th>
+                        <th class="title"></th>
+                        <th class="title"></th>
+                    </tr>
+                </template>
         </v-data-table>
       </v-card-text>
     </v-card>
