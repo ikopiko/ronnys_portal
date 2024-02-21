@@ -14,11 +14,14 @@ export default {
   data() {
     
     return {
+      sortBy: 'id',
+      sortDesc: true,
       deleteItemDialog: false,
       tempQty: '',
       tempItem: {},
       supplyItems: [],
       dataHeaders: [
+        { text: "created", align: "start", value: "created_at" },
         { text: "Name", align: "start", value: "product_name" },
         { text: "From Warehouse", value: "from_warehouse_name" },
         { text: "To Warehouse", value: "to_warehouse_name" },
@@ -77,45 +80,56 @@ export default {
               Authorization: "Bearer " + this.token,
             },
             data: {
+              id: this.tempItem.id,
               supply_id: this.tempItem.supplie_id,
               action: 'update',
-              quantity: this.supplyQty,
+              quantity: this.tempQty,
               items : this.supplyItems
             },
           })
           .then((response) => {
-            this.supplyModal = false;
+             this.historyProducteModal = false;
             this.color = "success";
+            this.semiActive = false;
             this.snackbarText = response.data.data;
             this.snackbar = true;
             this.getData(this.product.product_id);
+            setTimeout(() => {
+            this.$emit('closeModal');
+            }, 2000);
           });
     },
     deleteSupply(item){
       this.tempItem = item;
+  
       this.deleteItemDialog = true;
     },
     confirmDeleteSupply(){
       axios
         .request({
         method: "post",
-        url: this.$hostname + "warehouses/update-supply",
+        url: this.$hostname + "warehouses/delete-supply",
         headers: {
           Authorization: "Bearer " + this.token,
         },
         data: {
-          supply_id: this.tempItem.supplie_id,
+          id: this.tempItem.id,
           action: 'delete',
           quantity: this.supplyQty,
           items : {}
         },
       })
       .then((response) => {
+     
+     
         this.deleteItemDialog = false;
         this.color = "success";
         this.snackbarText = response.data.data;
         this.snackbar = true;
         this.getData(this.product.product_id);
+           setTimeout(() => {
+            this.$emit('closeModal');
+            }, 2000);
       });
     },
     getData(id){
@@ -199,6 +213,8 @@ export default {
         <v-card-text>
             <v-data-table
                 dense
+                 :sort-by.sync="sortBy"
+                 :sort-desc.sync="sortDesc"
                 :headers="dataHeaders"
                 :items="responseData"
                 :items-per-page="10"
@@ -231,9 +247,9 @@ export default {
                     <span>Correct Recipe</span>
                   </v-tooltip>
                 </template>
-              <template v-slot:[`item.actions`]="{ item }">
+              <template v-slot:[`item.actions`]="{ item }" >
                   <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on, attrs }" v-if="responseData.length>0 && item.id==responseData[responseData.length-1].id && item.action!='Delete' ">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small class="ma-2" color="red">
                           <v-icon small @click="deleteSupply(item)">
@@ -245,16 +261,16 @@ export default {
                     <span>Delete Supply</span>
                   </v-tooltip>
                   <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on, attrs }" v-if="responseData.length>0 && item.id==responseData[responseData.length-1].id && item.action!='Delete'">
                       <span v-bind="attrs" v-on="on">
                         <v-btn icon x-small class="ma-2" color="green">
                           <v-icon small @click="editSupply(item)">
-                            mdi-pencil
+                            mdi-pencil 
                           </v-icon>
                         </v-btn>
                       </span>
                     </template>
-                    <span>Edit Supply</span>
+                    <span>Edit Supply {{item.id}}</span>
                   </v-tooltip>
                 </template>
               </v-data-table>
@@ -267,11 +283,11 @@ export default {
                   clearable
                   dense
                   v-model="tempQty"
-                  :label="'Portion Amount'"
+                  :label="'Amount'"
                 ></v-text-field>
             </v-row>
             <v-row>
-            <span class="text-h6" style="color:black"> Edit Semi-Finished Product</span>
+            <!-- <span class="text-h6" style="color:black"> Edit Semi-Finished Product</span>
               <v-col cols="3" v-for="pv in semiItems" :key="pv.id">
                 <v-text-field
                   class=""
@@ -284,7 +300,7 @@ export default {
                 <div>
                   Amount By Repice: {{ (pv.quantity * tempQty) }}
                 </div>
-              </v-col>
+              </v-col> -->
             </v-row>
         </v-card-text>
         <v-card-actions>
@@ -294,7 +310,7 @@ export default {
         <v-card-actions>
           <v-spacer></v-spacer>
   
-          <v-btn
+          <v-btn v-if="semiActive"
             color="success me-2"
             elevation="0"
             small
@@ -304,7 +320,7 @@ export default {
             <i class="bx bx-save"></i> add
           </v-btn>
   
-          <v-btn
+          <v-btn v-if="semiActive"
             elevation="0"
             color="red"
             small

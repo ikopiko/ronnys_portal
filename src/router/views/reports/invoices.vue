@@ -54,8 +54,8 @@ export default {
       branchURL: null,
       json_fields: {
         "Order ID": "id",
-        "Delivery Method": "order_data.deliveryMethod",
-        "Billing Name": "order_data.customer.name",
+        "Delivery Method": "deliveryMethod",
+        "Billing Name": "customer.name",
         "Total price": "order_data.totalPrice",
         "Type":"order_data.discountName",
         "Amount": "order_data.newdiscount",
@@ -74,12 +74,12 @@ export default {
           sortable: true,
         },
               {
-          value: "order_data.deliveryMethod",
+          value: "deliveryMethod",
           text: "Order Type",
           sortable: true,
         },
         {
-          value: "order_data.customer.name",
+          value: "customer.name",
           text: "Customer Name",
           sortable: true,
         },
@@ -89,13 +89,13 @@ export default {
           sortable: true,
         },
  {
-          value: "order_data.totalPrice",
+          value: "total_price",
           text: "Total",
           sortable: true,
         },
 
   {
-          value: "order_data.totalDue",
+          value: "totalDue",
           text: "Total Due",
           sortable: true,
         },
@@ -143,15 +143,14 @@ export default {
     this.getReport()
   },
   methods: {
-    // eslint-disable-next-line no-unused-vars
-    showDetail(item){
+        showDetail(item){
       this.modalProductId = item.id
-      this.modalDiscType  = item.order_data.discountName
-      this.modalDisc = item.order_data.discount+this.discount(item,"discname")
-      this.modalCustomer =item.order_data.customer.name
+      this.modalDiscType  = item.discountName
+      this.modalDisc = item.discount+this.discount(item,"discname")
+      this.modalCustomer =item.customer.name
       this.fullOrder = item  
       this.order_data = item.order_data.items
-      this.modalTotalPrice = item.order_data.totalPrice
+      this.modalTotalPrice = item.total_price
       this.modalDiscount =  this.discount(item,"discounted")
       this.modalTotalDue = this.discount(item,"totalDue")
       this.detailModal = true
@@ -172,7 +171,7 @@ export default {
           else 
           return ((item.order_data.totalPrice / 100) * item.order_data.discount).toFixed(2)
           } else if(ident == "totalDue") {
-            if(item.order_data.discountName=="Diplomat")
+            if(item.discountName=="Diplomat")
               return  (item.order_data.totalPrice-(item.order_data.totalPrice - item.order_data.totalPrice / 1.18)).toFixed(2);
             else if(item.order_data.discountName=="Manager" && item.order_data.discountAmount == true)
             return (item.order_data.totalPrice - item.order_data.discount).toFixed(2)
@@ -203,18 +202,15 @@ export default {
           })
           .then((response) => {
             this.loader = false;
-            // eslint-disable-next-line no-console
-            this.supplyList = this.json_data = response.data.data
+                   this.supplyList = this.json_data = response.data.data
            
             this.supplyList.forEach((x) => {
-              x.order_data.newdiscount = x.order_data.discount+this.discount(x, "discname");
-              x.order_data.discounted = this.discount(x,"discounted");
-              x.order_data.totalDue = this.discount(x, "totalDue");
+              x.newdiscount = x.discount+this.discount(x, "discname");
+              x.discounted = this.discount(x,"discounted");
+           
               x.statusName =  this.orderStatuses[x.status-1].status_name 
             });
-            // eslint-disable-next-line no-console
-            console.log(this.supplyList)
-          });
+                 });
       }
     },
     updateRegion(event) {
@@ -347,11 +343,11 @@ export default {
         <v-card-text>
           <v-form ref="supplyForm" lazy-validation>
             <v-row>
-              <div class="mb-1">LTD: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.invoice.ltd:""}}</span></div>
-              <div class="mb-1">Address: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.invoice.address:""}}</span></div>
-              <div class="mb-1">ID #: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.invoice.id:""}}</span></div>
-              <div class="mb-1">Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.invoice.name:""}}</span></div>
-              <div>Customer Phone: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.invoice.phone:""}}</span></div>
+              <div class="mb-1">LTD: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.ltd:""}}</span></div>
+              <div class="mb-1">Address: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.address:""}}</span></div>
+              <div class="mb-1">ID #: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.id:""}}</span></div>
+              <div class="mb-1">Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.name:""}}</span></div>
+              <div>Customer Phone: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.phone:""}}</span></div>
               <hr>
 
                 <div class="table-responsive">

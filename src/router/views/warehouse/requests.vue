@@ -69,6 +69,8 @@ export default {
   },
   data() {
     return {
+   branchOptions:null,
+       branch: null,
       supplyItems: [],
       productRecipe: {},
       semiSelected: false,
@@ -153,15 +155,35 @@ export default {
   },
 
   mounted() {
+
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
     this.sentRequests();
-    this.getSupplyList();
+ 
     this.productslist();
     this.receiveRequests();
+            axios
+      .request({
+        method: "post",
+        url: this.$hostname + "warehouses/warehouse-list-for-supplie",
+        headers: {
+          Authorization: "Bearer " + this.TOKEN,
+        },
+      })
+      .then((response) => {
+        this.branchOptions = response.data;
+        if(this.branchOptions.length ==1)
+        this.branch = this.branchOptions[0]      
+         this.getSupplyList(this.branch["value"]);
+            });
   },
   methods: {
+    // eslint-disable-next-line no-unused-vars
+    updateRegion(value){
+      // eslint-disable-next-line no-console
+      console.log(value)
+    },
     testing(){
 
        this.productRecipe.forEach((x) => {
@@ -187,7 +209,7 @@ export default {
     },
     closeSendProducttModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
 
@@ -196,7 +218,7 @@ export default {
     },
     closeRecieveProductsModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
       this.seletedReceiveProductsItems = [];
@@ -204,7 +226,7 @@ export default {
     },
     closeAcceptRequestModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
 
@@ -213,7 +235,7 @@ export default {
     },
     closeSendRequestModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
       // closeSendRequestModal
@@ -221,12 +243,12 @@ export default {
       this.sendRequestModal = false;
     },
     closeWasteModal() {
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.wastProducteModal = false;
     },
     closeHistryeModal() {
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.historyProducteModal = false;
     },
@@ -279,7 +301,7 @@ export default {
           this.color = "success";
           this.snackbarText = response.data;
           this.snackbar = true;
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
@@ -325,7 +347,7 @@ export default {
           this.snackbar = true;
           this.showRecieveProductsModal = false;
           this.closeRecieveProductsModal();
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
           this.sentRequests();
         });
@@ -354,7 +376,7 @@ export default {
           this.snackbar = true;
           this.showAcceptListModal = false;
           this.seletedReceiveItems = [];
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
         })    .catch((error) => {
           // eslint-disable-next-line no-console
@@ -385,7 +407,7 @@ export default {
           this.color = "success";
           this.snackbarText = response.data;
           this.snackbar = true;
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
           this.sentRequests();
           this.closeSendProducttModal();
@@ -439,7 +461,7 @@ export default {
             this.snackbar = true;
             this.clearSupplyForm();
             this.clearSemiForm();
-            this.getSupplyList();
+            this.getSupplyList(this.branch["value"]);
           })
            .catch((error) => {
           // eslint-disable-next-line no-console
@@ -492,15 +514,16 @@ export default {
           this.productList = response.data;
         });
     },
-    getSupplyList() {
+    getSupplyList(wid) {
       var bodyFormData = new FormData();
-      bodyFormData.set("warehouse_id", this.warehouseId);
+      bodyFormData.set("warehouse_id",wid);
       axios
         .request({
           method: "post",
           url: this.$hostname + "warehouses/supplies-list",
           headers: {
             Authorization: "Bearer " + this.TOKEN,
+          
           },
           data: bodyFormData,
         })
@@ -594,6 +617,7 @@ export default {
         :token="this.TOKEN"
         :product="productForHistory"
         @closeModal="closeHistryeModal"
+        @supplieList="getSupplyList"
       />
     </v-dialog>
 
@@ -621,6 +645,15 @@ export default {
                   single-line
                   hide-details
                 ></v-text-field>
+                   <v-col cols="4">
+            <v-autocomplete
+             v-model="branch"
+              :items="branchOptions"
+              @change="(event) => updateRegion(event)"
+              dense
+              label="Select branch"
+            ></v-autocomplete>
+                   </v-col>
                 <v-spacer></v-spacer>
                 <b-button
                   size="sm"
@@ -630,6 +663,7 @@ export default {
                   <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                   Add supply
                 </b-button>
+                
               </v-card-title>
               <v-data-table
                 dense

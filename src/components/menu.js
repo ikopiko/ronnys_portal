@@ -9,7 +9,8 @@ export const menuItems = [
         id: 8,
         label: "menuitems.discount.text",
         icon: "bx-money",
-        link: "/reports/discounts"
+        link: "/reports/discounts",
+        roles:{"global_manager":true,"loca_manager":false}
     },
     {
         id: 9,
