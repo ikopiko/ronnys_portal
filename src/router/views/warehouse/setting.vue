@@ -912,8 +912,8 @@ export default {
             var recipe3 = [];
             var tempObj3 = {};
             this.productValues.forEach(x => {
-              tempObj3.product_id = x.id;
-              tempObj3.qty = x.recipeAmount;
+              tempObj3.product_id = x.child_product_id;
+              tempObj3.qty = x.batchAmount;
               recipe3.push(tempObj3);
               tempObj3 = {};
             });
@@ -1739,13 +1739,13 @@ export default {
               <v-row>
                 <v-col cols="3" v-for="pv in productValues" :key="pv.id">
                   <v-text-field
-                    class=""
+                    class="font-size-12"
                     clearable
                     dense
-                    type="number"
-                    v-model="pv.recipeAmount"
+                    type=""
+                    v-model="pv.batchAmount"
                     :append-icon="pv.unit"
-                    :label="'Enter ' + pv.name + ' quantity'"
+                    :label="'Enter ' + pv.child_product_name + ' quantity'"
                   ></v-text-field>
                 </v-col>
               </v-row>
