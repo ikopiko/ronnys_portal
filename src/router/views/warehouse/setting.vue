@@ -1729,6 +1729,7 @@ export default {
                   class="my-5"
                   clearable
                   dense
+                  type="number"
                   v-model="portionSize"
                   :append-icon="appendUnitTemp"
                   :label="'Enter Portion Size'"
@@ -1741,6 +1742,7 @@ export default {
                     class=""
                     clearable
                     dense
+                    type="number"
                     v-model="pv.recipeAmount"
                     :append-icon="pv.unit"
                     :label="'Enter ' + pv.name + ' quantity'"

@@ -1124,7 +1124,7 @@ export default {
 
                 <div style="font-size:12px">
                   Amount By Repice:
-                  {{pv.qty * portionQty + " " + pv.unit.toUpperCase() }}
+                  {{(pv.qty * portionQty) + " " + pv.unit.toUpperCase() }}
                 </div>
               </v-col>
             </v-row>
