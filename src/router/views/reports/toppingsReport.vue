@@ -47,6 +47,7 @@ export default {
         { value: "vake", text: "Vake" },
         { value: "digomi", text: "Digomi" },
         { value: "gldani", text: "Gldani" },
+        { value: "Avlabari", text: "Avlabari" }
       ],
       warehouseId: null,
       supplyList: [],
@@ -74,19 +75,6 @@ export default {
 
         this.json_data = this.supplyList = [];
 
-        if (this.branch == "saburtalo") {
-          this.branchURL =
-            "http://178.134.12.106:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "vake") {
-          this.branchURL =
-            "http://94.43.92.102:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "digomi") {
-          this.branchURL =
-            "http://109.172.176.98:8082/ronny/rest/web/index.php?r=v1/";
-        } else if (this.branch == "gldani") {
-          this.branchURL =
-            "http://178.134.47.222:8082/ronny/rest/web/index.php?r=v1/";
-        }
 
         axios
           .request({
@@ -105,6 +93,7 @@ export default {
             // eslint-disable-next-line no-console
             this.json_data = this.supplyList = response.data;
             this.supplyList.forEach((x) => {
+              x.amount  = x.amount.toFixed(2)
               x.selected = false;
             });
           });

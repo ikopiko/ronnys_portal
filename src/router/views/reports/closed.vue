@@ -36,6 +36,7 @@ export default {
         { value: "3", text: "Vake" },
         { value: "1", text: "Digomi" },
         { value: "4", text: "Gldani" },
+        { value: "5", text: "Avlabari" }
       ],
       warehouseId: null,
       supplyList: [],
@@ -132,6 +133,8 @@ export default {
         this.exportName = "Vake" 
       if(event ==4)
         this.exportName = "Gldani"
+      if(event ==5)
+        this.exportName = "Avlabari"
       
       this.exportName += " - "+this.date
       
