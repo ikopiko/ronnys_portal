@@ -39,6 +39,7 @@ export default {
         { id: 6, name: "ქვე-ზედნადები" },
       ],
       statusId: "",
+      test:[""],
       statusList: [
         { id: "0", name: "შენახული" },
         { id: 1, name: "აქტიური" },
@@ -59,6 +60,7 @@ export default {
       waybillDetail: null,
       snackbar: false,
       color: "default",
+      unitname:null,
       snackbarText: null,
       TOKEN: null,
       warehouseId: null,
@@ -105,21 +107,26 @@ export default {
       this.productslist();
   },
   methods: {
+
       addBarCode() {
      // var bodyFormData = new FormData();
      
+     // eslint-disable-next-line no-console
+     console.log(this.waybillGoodsList)
+
     if (this.$refs.supplyForm.validate()) {
       axios
         .request({
           method: "post",
-          url: this.$hostname + "warehouses/add-barcode",
+          url: this.$hostname + "warehouses/confirm-waybill",
           headers: {
             Authorization: "Bearer " + this.TOKEN,
           },
-          data: {"list":this.selectproduct},
+          data:  this.waybillGoodsList,
         })
         .then((response) => {
           this.selectproduct = []
+          this.waybillModal = false;
           this.color = "success";
           this.snackbarText = response.data.data;
           this.snackbar = true;
@@ -140,12 +147,13 @@ export default {
       axios
         .request({
           method: "post",
-          url: this.$hostname + "warehouses/products-list",
+          url: this.$hostname + "warehouses/products-list-waybill",
           headers: {
             Authorization: "Bearer " + this.TOKEN,
           },
         })
         .then((response) => {
+        
           this.productList = response.data;
         })
     },
@@ -373,7 +381,7 @@ export default {
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="waybillModal" max-width="800">
+    <v-dialog v-model="waybillModal" max-width="1200">
       <v-card>
         <v-toolbar color="white" elevation="0">
           <span class="text-h6"> Waybill Detail</span>
@@ -387,22 +395,19 @@ export default {
 
         <hr />
         <v-card-text>
-         
             <v-row>
               <v-col cols="12">
                 <v-data-table
-                  show-select
                   dense
                   :hide-default-footer="true"
                   :headers="waybillDetailHeader"
                   :items="waybillGoodsList"
                   item-key="ID"
-                  :items-per-page="10"
                   v-model="selectproduct"
                 >
                 </v-data-table>
               </v-col>
-                <v-col cols="12" align="right">
+                <!-- <v-col cols="12" align="right">
                 <v-btn
                   color="success me-2"
                   elevation="0"
@@ -413,11 +418,11 @@ export default {
                   <i class="bx bx-check"></i> Confirm waybill
                 </v-btn>
               </v-col>
-             
+              -->
               <v-form ref="supplyForm" lazy-validation>
               <v-col cols="12">
-                <v-row v-for="pv in selectproduct" :key="pv.id">
-                  <v-col cols="6">
+                <v-row v-for="pv in waybillGoodsList" :key="pv.id">
+                  <v-col cols="4">
                     <v-text-field
                       class=""
                       clearable
@@ -428,28 +433,37 @@ export default {
                       :label="'Enter name'"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="6">
+                  <v-col cols="2">
+                    <v-text-field
+                      class="font-size-12"
+                      clearable
+                      dense
+                      v-model="pv.weight"
+                      :label="'Enter Weight'"
+                      :append-icon="pv.unit_name"
+                    ></v-text-field>
+                  </v-col>
+
+                  <v-col cols="3">
                     <v-autocomplete
                       dense
-                      v-model="pv.asd"
-                         :rules="nameRules"
+                      v-model="pv.product_id"
+                      :rules="nameRules"
                       :items="productList"
                       item-text="name"
-                      label="Choose product"
                       return-object
-                      hide-selected
-                      clearable
-                      chips
-                      small-chips
-                      deletable-chips
-                      
-                    ></v-autocomplete>
+                      label="Choose product"
+                      clearable></v-autocomplete>
+                  </v-col>
+                  <v-col>
+                    full weight: 
+                    {{pv.weight*pv.QUANTITY}} {{pv.unit_name}}
                   </v-col>
                 </v-row>
               </v-col>
 
           
-              <v-col cols="12" align="right" v-if="selectproduct.length>0?true:false">
+              <v-col cols="12" align="right">
                 <v-btn
                   color="success me-2"
                   elevation="0"
@@ -457,7 +471,7 @@ export default {
                   small
                   class="white--text text-capitalize"
                 >
-                  <i class="bx bx-check"></i> add barcodes
+                  <i class="bx bx-check"></i> Confirm Waybill
                 </v-btn>
               </v-col>
                 </v-form>
@@ -479,5 +493,8 @@ export default {
 .table-footer-prepend {
   margin-top: -58px;
   height: 58px;
+}
+.v-icon.v-icon {
+  font-size: 14px !important;
 }
 </style>

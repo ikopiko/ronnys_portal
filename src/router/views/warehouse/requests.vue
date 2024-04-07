@@ -96,12 +96,14 @@ export default {
       color: "default",
       snackbarText: null,
       TOKEN: null,
+      createIcon:null,
       supplyMinQty: null,
       warehouseId: null,
       supplyModal: false,
       supplyId: {},
       supplyQty: null,
       portionQty: 1,
+      portionAmount:1,
       recieveProductList: [],
       supplyList: [],
       suppliesSearch: "",
@@ -185,7 +187,8 @@ export default {
       console.log(value)
     },
     testing(){
-
+      this.supplyQty = this.portionQty*this.supplyId.portion_size
+      this.createIcon = this.supplyId.unit
        this.productRecipe.forEach((x) => {
     
             x.batchAmount =this.portionQty*x.qty;
@@ -194,9 +197,10 @@ export default {
     },
     selectSupplie(item) {
       const m = this.supplyList.filter((rqs) => {
-            return rqs.product_id == item;
+            return rqs.product_id == item.id;
           });
-
+            this.createIcon = item.unit
+            this.supplyQty = item.portion_size
             this.supplyMinQty = m[0].min_quantity
     },
     wasteProduct(product) {
@@ -422,10 +426,11 @@ export default {
       this.seletedReceiveItems.splice(key, 1);
     },
     addSupply() {
+     
       if (this.$refs.supplyForm.validate()) {
         if (this.supplyId.category_id == 2) {
           this.productRecipe.forEach((x) => {
-            var temp_obj = {};
+             var temp_obj = {};
 
             temp_obj.product_id = x.child_product_id;
             temp_obj.qty = x.batchAmount;
@@ -435,7 +440,8 @@ export default {
             // this.supplyItems = temp_obj
             this.temp_obj = {};
           });
-          this.supplyQty = this.portionQty;
+         
+        
         } else {
           this.supplyItems = [];
         }
@@ -462,6 +468,7 @@ export default {
             this.clearSupplyForm();
             this.clearSemiForm();
             this.getSupplyList(this.branch["value"]);
+             this.supplyItems = [];
           })
            .catch((error) => {
           // eslint-disable-next-line no-console
@@ -475,7 +482,7 @@ export default {
       this.supplyId = null;
       // this.warehouseId = null;
       this.supplyQty = null;
-      this.portionQty = null;
+      this.portionQty = 1;
       this.supplyMinQty = null;
       this.semiSelected = false;
     },
@@ -1068,7 +1075,7 @@ export default {
                 <v-autocomplete
                   v-model="supplyId"
                   :items="productList"
-                   @change="selectSupplie(supplyId.id)"
+                   @change="selectSupplie(supplyId)"
                   item-text="name"
                   dense
                   return-object
@@ -1077,9 +1084,9 @@ export default {
                   label="Select Product"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="4"  v-if="semiSelected">
                 <v-text-field
-                  v-if="semiSelected"
+                 
                   dense
                   @input="testing()"
                   v-model="portionQty"
@@ -1087,24 +1094,28 @@ export default {
                   label="Portion quantity"
                   required
                 ></v-text-field>
-                <v-text-field
-                  v-else
+              </v-col>
+              <v-col col="4">
+                 <v-text-field
                   dense
                   v-model="supplyQty"
-                  :rules="[(v) => !!v || 'Amount is required']"
-                  label="Amount"
+                  :rules="[(v) => !!v || 'Quantity is required']"
+                  label="Quantity"
                   required
                 ></v-text-field>
               </v-col>
+
               <v-col cols="4">
                 <v-text-field
                   dense
                   v-model="supplyMinQty"
                   :rules="[(v) => !!v || 'Minimum Quantity is required']"
-                  label="Minimum amount"
+                  label="Minimum Quantity"
                   required
                 ></v-text-field>
               </v-col>
+             
+
             </v-row>
             <v-row v-if="semiSelected">
               <span class="text-h6" style="color: black">
@@ -1115,7 +1126,6 @@ export default {
                   
                   clearable
                   dense
-                  
                   v-model="pv.batchAmount"
                   :rules="[(v) => !!v || 'Supply is required']"
                   :append-icon="pv.unit"
@@ -1123,7 +1133,7 @@ export default {
                 ></v-text-field>
 
                 <div style="font-size:12px">
-                  Amount By Repice:
+                  Quantity By Repice:
                   {{(pv.qty * portionQty) + " " + pv.unit.toUpperCase() }}
                 </div>
               </v-col>
