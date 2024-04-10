@@ -69,6 +69,8 @@ export default {
   },
   data() {
     return {
+   branchOptions:null,
+       branch: null,
       supplyItems: [],
       productRecipe: {},
       semiSelected: false,
@@ -94,12 +96,14 @@ export default {
       color: "default",
       snackbarText: null,
       TOKEN: null,
+      createIcon:null,
       supplyMinQty: null,
       warehouseId: null,
       supplyModal: false,
       supplyId: {},
       supplyQty: null,
       portionQty: 1,
+      portionAmount:1,
       recieveProductList: [],
       supplyList: [],
       suppliesSearch: "",
@@ -153,17 +157,38 @@ export default {
   },
 
   mounted() {
+
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
     this.sentRequests();
-    this.getSupplyList();
+ 
     this.productslist();
     this.receiveRequests();
+            axios
+      .request({
+        method: "post",
+        url: this.$hostname + "warehouses/warehouse-list-for-supplie",
+        headers: {
+          Authorization: "Bearer " + this.TOKEN,
+        },
+      })
+      .then((response) => {
+        this.branchOptions = response.data;
+        if(this.branchOptions.length ==1)
+        this.branch = this.branchOptions[0]      
+         this.getSupplyList(this.branch["value"]);
+            });
   },
   methods: {
+    // eslint-disable-next-line no-unused-vars
+    updateRegion(value){
+      // eslint-disable-next-line no-console
+      console.log(value)
+    },
     testing(){
-
+      this.supplyQty = this.portionQty*this.supplyId.portion_size
+      this.createIcon = this.supplyId.unit
        this.productRecipe.forEach((x) => {
     
             x.batchAmount =this.portionQty*x.qty;
@@ -172,9 +197,10 @@ export default {
     },
     selectSupplie(item) {
       const m = this.supplyList.filter((rqs) => {
-            return rqs.product_id == item;
+            return rqs.product_id == item.id;
           });
-
+            this.createIcon = item.unit
+            this.supplyQty = item.portion_size
             this.supplyMinQty = m[0].min_quantity
     },
     wasteProduct(product) {
@@ -187,7 +213,7 @@ export default {
     },
     closeSendProducttModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
 
@@ -196,7 +222,7 @@ export default {
     },
     closeRecieveProductsModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
       this.seletedReceiveProductsItems = [];
@@ -204,7 +230,7 @@ export default {
     },
     closeAcceptRequestModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
 
@@ -213,7 +239,7 @@ export default {
     },
     closeSendRequestModal() {
       this.sentRequests();
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.receiveRequests();
       // closeSendRequestModal
@@ -221,12 +247,12 @@ export default {
       this.sendRequestModal = false;
     },
     closeWasteModal() {
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.wastProducteModal = false;
     },
     closeHistryeModal() {
-      this.getSupplyList();
+      this.getSupplyList(this.branch["value"]);
       this.productslist();
       this.historyProducteModal = false;
     },
@@ -279,7 +305,7 @@ export default {
           this.color = "success";
           this.snackbarText = response.data;
           this.snackbar = true;
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
@@ -325,7 +351,7 @@ export default {
           this.snackbar = true;
           this.showRecieveProductsModal = false;
           this.closeRecieveProductsModal();
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
           this.sentRequests();
         });
@@ -354,7 +380,7 @@ export default {
           this.snackbar = true;
           this.showAcceptListModal = false;
           this.seletedReceiveItems = [];
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
         })    .catch((error) => {
           // eslint-disable-next-line no-console
@@ -385,7 +411,7 @@ export default {
           this.color = "success";
           this.snackbarText = response.data;
           this.snackbar = true;
-          this.getSupplyList();
+          this.getSupplyList(this.branch["value"]);
           this.receiveRequests();
           this.sentRequests();
           this.closeSendProducttModal();
@@ -400,10 +426,11 @@ export default {
       this.seletedReceiveItems.splice(key, 1);
     },
     addSupply() {
+     
       if (this.$refs.supplyForm.validate()) {
         if (this.supplyId.category_id == 2) {
           this.productRecipe.forEach((x) => {
-            var temp_obj = {};
+             var temp_obj = {};
 
             temp_obj.product_id = x.child_product_id;
             temp_obj.qty = x.batchAmount;
@@ -413,7 +440,8 @@ export default {
             // this.supplyItems = temp_obj
             this.temp_obj = {};
           });
-          this.supplyQty = this.portionQty;
+         
+        
         } else {
           this.supplyItems = [];
         }
@@ -439,7 +467,8 @@ export default {
             this.snackbar = true;
             this.clearSupplyForm();
             this.clearSemiForm();
-            this.getSupplyList();
+            this.getSupplyList(this.branch["value"]);
+             this.supplyItems = [];
           })
            .catch((error) => {
           // eslint-disable-next-line no-console
@@ -453,7 +482,7 @@ export default {
       this.supplyId = null;
       // this.warehouseId = null;
       this.supplyQty = null;
-      this.portionQty = null;
+      this.portionQty = 1;
       this.supplyMinQty = null;
       this.semiSelected = false;
     },
@@ -492,15 +521,16 @@ export default {
           this.productList = response.data;
         });
     },
-    getSupplyList() {
+    getSupplyList(wid) {
       var bodyFormData = new FormData();
-      bodyFormData.set("warehouse_id", this.warehouseId);
+      bodyFormData.set("warehouse_id",wid);
       axios
         .request({
           method: "post",
           url: this.$hostname + "warehouses/supplies-list",
           headers: {
             Authorization: "Bearer " + this.TOKEN,
+          
           },
           data: bodyFormData,
         })
@@ -594,6 +624,7 @@ export default {
         :token="this.TOKEN"
         :product="productForHistory"
         @closeModal="closeHistryeModal"
+        @supplieList="getSupplyList"
       />
     </v-dialog>
 
@@ -621,6 +652,15 @@ export default {
                   single-line
                   hide-details
                 ></v-text-field>
+                   <v-col cols="4">
+            <v-autocomplete
+             v-model="branch"
+              :items="branchOptions"
+              @change="(event) => updateRegion(event)"
+              dense
+              label="Select branch"
+            ></v-autocomplete>
+                   </v-col>
                 <v-spacer></v-spacer>
                 <b-button
                   size="sm"
@@ -630,6 +670,7 @@ export default {
                   <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                   Add supply
                 </b-button>
+                
               </v-card-title>
               <v-data-table
                 dense
@@ -1034,7 +1075,7 @@ export default {
                 <v-autocomplete
                   v-model="supplyId"
                   :items="productList"
-                   @change="selectSupplie(supplyId.id)"
+                   @change="selectSupplie(supplyId)"
                   item-text="name"
                   dense
                   return-object
@@ -1043,9 +1084,9 @@ export default {
                   label="Select Product"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="4"  v-if="semiSelected">
                 <v-text-field
-                  v-if="semiSelected"
+                 
                   dense
                   @input="testing()"
                   v-model="portionQty"
@@ -1053,24 +1094,28 @@ export default {
                   label="Portion quantity"
                   required
                 ></v-text-field>
-                <v-text-field
-                  v-else
+              </v-col>
+              <v-col col="4">
+                 <v-text-field
                   dense
                   v-model="supplyQty"
-                  :rules="[(v) => !!v || 'Amount is required']"
-                  label="Amount"
+                  :rules="[(v) => !!v || 'Quantity is required']"
+                  label="Quantity"
                   required
                 ></v-text-field>
               </v-col>
+
               <v-col cols="4">
                 <v-text-field
                   dense
                   v-model="supplyMinQty"
                   :rules="[(v) => !!v || 'Minimum Quantity is required']"
-                  label="Minimum amount"
+                  label="Minimum Quantity"
                   required
                 ></v-text-field>
               </v-col>
+             
+
             </v-row>
             <v-row v-if="semiSelected">
               <span class="text-h6" style="color: black">
@@ -1081,7 +1126,6 @@ export default {
                   
                   clearable
                   dense
-                  
                   v-model="pv.batchAmount"
                   :rules="[(v) => !!v || 'Supply is required']"
                   :append-icon="pv.unit"
@@ -1089,8 +1133,8 @@ export default {
                 ></v-text-field>
 
                 <div style="font-size:12px">
-                  Amount By Repice:
-                  {{pv.qty * portionQty + " " + pv.unit.toUpperCase() }}
+                  Quantity By Repice:
+                  {{(pv.qty * portionQty) + " " + pv.unit.toUpperCase() }}
                 </div>
               </v-col>
             </v-row>

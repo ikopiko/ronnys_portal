@@ -46,6 +46,7 @@ export default {
         { value: "Vake", text: "Vake" },
         { value: "Digomi", text: "Digomi" },
         { value: "Gldani", text: "Gldani" },
+        { value: "Avlabari", text: "Avlabari" }
       ],
       warehouseId: null,
       supplyList: [],

@@ -47,6 +47,7 @@ export default {
         { value: "vake", text: "Vake" },
         { value: "digomi", text: "Digomi" },
         { value: "gldani", text: "Gldani" },
+        { value: "Avlabari", text: "Avlabari" }
       ],
       warehouseId: null,
       supplyList: [],
@@ -74,6 +75,10 @@ export default {
 
         this.json_data = this.supplyList = [];
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
         axios
           .request({
             method: "post",
@@ -92,6 +97,7 @@ export default {
             this.json_data = this.supplyList = response.data;
             
             this.supplyList.forEach((x) => {
+              x.amount  = x.amount.toFixed(2)
               x.selected = false;
               x.amount = Number(x.amount).toFixed(2)
             });
