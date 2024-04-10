@@ -68,6 +68,7 @@ export default {
           this.supplyQty = this.portionQty;
         } else {
           this.supplyItems = {};
+          this.supplyQty = this.tempQty;
         }
         axios
           .request({
@@ -186,7 +187,7 @@ export default {
       </v-snackbar>
       <v-card>
         <v-toolbar color="white" elevation="0">
-          <span class="text-h6">{{ product.product_name }} Supply  History List</span>
+          <span class="text-h6">{{ product.product_name }} Supply History List</span>
           <v-spacer></v-spacer>
           <v-card-actions class="justify-end">
             <v-btn @click="closeModal" icon small color="gray">
@@ -271,7 +272,7 @@ export default {
                 ></v-text-field>
             </v-row>
             <v-row>
-            <span class="text-h6" style="color:black"> Edit Semi-Finished Product</span>
+            <span class="text-h6" style="color:black" v-if="product.products_category_id == 2"> Edit Semi-Finished Product</span>
               <v-col cols="3" v-for="pv in semiItems" :key="pv.id">
                 <v-text-field
                   class=""

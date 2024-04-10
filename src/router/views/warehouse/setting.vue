@@ -276,10 +276,7 @@ export default {
     },
 
     editProduct(item) {
-      if(item.category_id ==2) {
-        this.getRecipe(item)
-      }
-      const m = this.unitsList.filter((rqs) => {
+       const m = this.unitsList.filter((rqs) => {
         return rqs.name == item.unit;
       });
       
@@ -498,7 +495,18 @@ export default {
           data: bodyFormData,
         })
         .then((response) => {
-          this.productValues = response.data;
+          this.editedItemRecipe = response.data;
+
+          this.editedItemRecipe.forEach(x => {
+            var obj = {
+              name: x.child_product_name,
+              id: x.child_product_id,
+              unit: x.unit,
+              recipeAmount: x.qty
+            };
+            this.productValues.push(obj);
+          })
+          // this.productValues = response.data;
         });
     },
     deleteUnitConfirm() {

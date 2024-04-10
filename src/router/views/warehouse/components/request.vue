@@ -26,7 +26,7 @@ export default {
     axios
       .request({
         method: "post",
-        url: this.$hostname + "warehouses/products-list",
+        url: tgit .$hostname + "warehouses/products-list",
         headers: {
           Authorization: "Bearer " + this.token,
         },
