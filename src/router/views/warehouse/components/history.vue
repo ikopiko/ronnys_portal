@@ -288,11 +288,7 @@ export default {
                 ></v-text-field>
             </v-row>
             <v-row>
-<<<<<<< HEAD
-            <span class="text-h6" style="color:black" v-if="product.products_category_id == 2"> Edit Semi-Finished Product</span>
-=======
             <!-- <span class="text-h6" style="color:black"> Edit Semi-Finished Product</span>
->>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
               <v-col cols="3" v-for="pv in semiItems" :key="pv.id">
                 <v-text-field
                   class=""

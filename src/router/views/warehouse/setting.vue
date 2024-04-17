@@ -116,14 +116,10 @@ export default {
       editedTypeIndex: -1, 
       editedProductIndex: -1,
       productSearch: "",
-<<<<<<< HEAD
       editedItemRecipe: {
-
       },
-=======
       roleList:[],
       roleValues:null,
->>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
       editedItem: {
         name: "",
         calories: 0,
@@ -326,16 +322,12 @@ export default {
     },
 
     editProduct(item) {
-<<<<<<< HEAD
-       const m = this.unitsList.filter((rqs) => {
-=======
       // eslint-disable-next-line no-console
       console.log(item)
       if(item.category_id ==2) {
         this.getRecipe(item)
       }
       const m = this.unitsList.filter((rqs) => {
->>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
         return rqs.name == item.unit;
       });
       this.roleValues=item.role.split(",")
@@ -2076,16 +2068,10 @@ export default {
                     class="font-size-12"
                     clearable
                     dense
-<<<<<<< HEAD
-                    v-model="pv.recipeAmount"
-                    :append-icon="pv.unit.charAt()"
-                    :label="'Enter ' + pv.name + ' quantity'"
-=======
                     type=""
                     v-model="pv.batchAmount"
                     :append-icon="pv.unit"
                     :label="'Enter ' + pv.child_product_name + ' quantity'"
->>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
                   ></v-text-field>
                 </v-col>
               </v-row>

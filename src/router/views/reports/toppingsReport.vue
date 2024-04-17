@@ -75,10 +75,6 @@ export default {
 
         this.json_data = this.supplyList = [];
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a63a4d81f65283ee3596a0de03f4e2848040063f
         axios
           .request({
             method: "post",

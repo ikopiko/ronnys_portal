@@ -13,9 +13,12 @@ export default {
         return {
             menuItems: menuItems,
             menuData: null,
+            loggedUser: {},
         };
     },
     mounted: function () {
+        this.loggedUser = this.$store.state.authfack.user;
+
     
         // eslint-disable-next-line no-unused-vars
         var menuRef = new MetisMenu("#side-menu");
@@ -82,6 +85,9 @@ export default {
         hasItems(item) {
             return item.subItems !== undefined ? item.subItems.length > 0 : false;
         },
+        hasRole(item){
+            return item.role == this.loggedUser.role || item.role == 'all' ? true : false;
+        },
 
         toggleMenu(event) {
             event.currentTarget.nextElementSibling.classList.toggle("mm-show");
@@ -101,10 +107,11 @@ export default {
             <li class="menu-title" v-if="item.isTitle" :key="item.id">
                 {{ $t(item.label) }}
             </li>
-            <li v-if="!item.isTitle && !item.isLayout" :key="item.id">
+            <li v-if="!item.isTitle && !item.isLayout && hasRole(item)" :key="item.id">
                 <a v-if="hasItems(item)" href="javascript:void(0);" class="is-parent" :class="{ 'has-arrow': !item.badge, 'has-dropdown': item.badge }">
                     <i :class="`bx ${item.icon}`" v-if="item.icon"></i>
-                    <span>{{ $t(item.label) }}</span>
+                    <span>{{ $t(item.label) }}
+                    {{ item.role }}</span>
                     <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
                 </a>
 
@@ -126,6 +133,7 @@ export default {
                     </li>
                 </ul>
             </li>
+            
         </template>
     </ul>
 </div>
