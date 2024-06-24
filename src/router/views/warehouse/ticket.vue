@@ -20,6 +20,18 @@ export default {
   components: {
     Layout,
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+         vm.$router.push({path: "/warehouse/ticket"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   computed: {},
 
   watch: {
@@ -139,7 +151,7 @@ export default {
           v-model="seletedticket"
         >
 
-          <template c v-slot:[`item.actions`]="{ item }">
+          <template v-slot:[`item.actions`]="{ item }">
             <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
                 <span v-bind="attrs" v-on="on">

@@ -10,6 +10,18 @@ export default {
   components: {
     Layout,
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+         vm.$router.push({path: "/warehouse/barcodes"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   computed: {},
   data() {
     return {

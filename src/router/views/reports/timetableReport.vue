@@ -8,7 +8,7 @@ import moment from "moment";
 Vue.use(excel);
 export default {
   page: {
-    title: "Sales Report",
+    title: "Timetable Report",
   },
   components: {
     Layout,
@@ -17,6 +17,10 @@ export default {
   computed: {},
   data() {
     return {
+      sheet: false,
+      errorText: '',
+      detailedInfoModal: false,
+      detailedInfo: [],
       dateString: '',
       modalTotalPrice:null,
       modalDiscount:null,
@@ -125,10 +129,23 @@ export default {
           text: "Created At",
           sortable: true,
         },
+        { text: "Actions", value: "actions", align: "end", sortable: false },
        
       ],
       nameRules: [(v) => !!v || " required"],
     };
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "hrManager") {
+         vm.$router.push({path: "/reports/timetable"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
   },
   mounted() {
     this.formatRange(this.date);
@@ -145,6 +162,38 @@ export default {
     },
   },
   methods: {
+    editItemFinish(item){
+      if(item.comment != ''){
+        const TOKEN = this.loggedUser.token;
+        var bodyFormData = new FormData();
+        bodyFormData.set("id", item.id);
+        bodyFormData.set("start_date", item.start_date);
+        bodyFormData.set("comment", "BLA");
+        // bodyFormData.set("order_id", this.order.orderId);
+        axios
+          .request({
+            method: "post",
+            url:
+              this.$hostname + "tabel/edit",
+            headers: {
+              Authorization: "Bearer " + TOKEN,
+            },
+            data: bodyFormData,
+          })
+          .then((response) => {
+            // this.getList(this.selectedTabel);
+            this.errorText = response.data.data;
+            this.sheet = true;
+            this.getReport();
+            this.$forceUpdate();
+          });
+
+      } else {
+        this.errorText = "Comment is a must for editing tabel item";
+        this.sheet = true;
+      }
+
+  },
     formatDate(val){
       // alert(this.isEmpty(val));
       if(val != ''){
@@ -179,42 +228,31 @@ export default {
         const sum =  this.tabelList.reduce((a, b) => a*1 + (b[key]*1 || 0), 0)
         return sum.toFixed(2)
     },
+    toogleDetailedModal() {
+      this.detailedInfoModal = !this.detailedInfoModal;
+    },
 
     showDetail(item){
-
-
+      // this.detailedInfo = item;
+        var bodyFormData = new FormData();
+        bodyFormData.set("id", item.id);
         axios
           .request({
             method: "post",
-            url: this.$hostname + "orders/get-orderata-by-id-portal",
+            url: this.$hostname + "tabel/list",
             headers: {
               Authorization: "Bearer " + this.TOKEN,
             },
             data: {
-              order_id: item.id,
+             id: item.id,
 
             },
           })
           .then((response) => {
             // eslint-disable-next-line no-console
-            item = response.data.data
-           this.modalProductId = item.id
-            this.modalDiscType  = item.order_data.discountName
-            this.modalDisc = item.order_data.discount+this.discount(item,"discname")
-            this.modalCustomer =item.order_data.customer.name
-            this.order_data = item.order_data.items
-            this.modalTotalPrice = item.order_data.totalPrice
-            this.modalDiscount =  (item.total_price-item.totalDue).toFixed(2)
-            this.modalTotalDue = item.totalDue
-            this.detailModal = true
-            this.detailModal = true
+            this.detailedInfo = response.data.data;
+            this.toogleDetailedModal();
             });
-          
-   
-    
-
-
-    
     },
     
      discount(item, ident){
@@ -267,13 +305,13 @@ export default {
             // eslint-disable-next-line no-console
             this.tabelList = this.json_data = response.data.data;
             
-            this.tabelList.forEach(x => {
-              x.workHours = (Number(x.worktime) / 60).toFixed(2);
-              x.startwork = this.formatDate(Number(x.startwork));
-              x.endwork = this.formatDate(Number(x.endwork));
-              x.endbreak = this.formatDate(Number(x.endbreak));
-              x.startbreak = this.formatDate(Number(x.startbreak));
-            });
+            // this.tabelList.forEach(x => {
+            //   x.workHours = (Number(x.worktime) / 60).toFixed(2);
+            //   x.startwork = this.formatDate(Number(x.startwork));
+            //   x.endwork = this.formatDate(Number(x.endwork));
+            //   x.endbreak = this.formatDate(Number(x.endbreak));
+            //   x.startbreak = this.formatDate(Number(x.startbreak));
+            // });
 
           
           });
@@ -368,19 +406,22 @@ export default {
          
             <template  v-slot:[`item.actions`]="{ item }">
               <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">
-                        <v-btn icon color="primary">
-                          <v-icon small @click="showDetail(item)">
-                            mdi-eye
-                          </v-icon>
-                        </v-btn>
-                      </span>
-                    </template>
-                    <span>View Details</span>
-                  </v-tooltip>
-              
-              
+                <template v-slot:activator="{ on, attrs }">
+                  <span v-bind="attrs" v-on="on">
+                    <v-btn icon color="primary" v-if="item.endwork == ''" class="inactive">
+                      <v-icon small>
+                        mdi-pencil
+                      </v-icon>
+                    </v-btn>
+                    <v-btn icon color="primary" v-else>
+                      <v-icon small @click="showDetail(item)">
+                        mdi-pencil
+                      </v-icon>
+                    </v-btn>
+                  </span>
+                </template>
+                <span>Edit Info</span>
+              </v-tooltip>
             </template>
         </v-data-table>
       </v-card-text>
@@ -486,6 +527,117 @@ export default {
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+        v-model="detailedInfoModal"
+        max-width="800px"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="headline">Timeclock Details</span>
+            <export-excel
+              class="btn btn-success"
+              :data="detailedInfo"
+              :fields="json_fields"
+              worksheet="Worksheet"
+            >
+              <i class="mdi mdi-download"> Excel Export </i>
+            </export-excel>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="2">
+                <v-menu
+                  v-model="menu"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="date"
+                      label="Select Date"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="date"
+                    @input="menu = false"
+                  ></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="10">
+
+                <template>
+                  <v-simple-table height="300px">
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Name
+                          </th>
+                          <th class="text-left">
+                            State
+                          </th>
+                          <th class="text-left">
+                            Start Date
+                          </th>
+                          <th class="text-left">
+                            Comment
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in detailedInfo" :key="index">
+                          <td>{{ item.user_name }}</td>
+                          <td>{{ item.state }}</td>
+                          <td>
+                          <!-- <input type="text" class="form-control" :value="item.start_date" :v-model="item.start_date"> -->
+                          <input type="text" class="form-control" v-model="item.start_date" placeholder="edit me" @keypress="isNumber($event)" />
+                          </td>
+                          <td><input type="text" class="form-control" placeholder="Comment" v-model="item.comment"></td>
+                          <td><v-btn @click="editItemFinish(item)">Edit Item</v-btn></td>
+                        </tr>
+                        <tr><td>
+                          <v-btn @click="detailedInfoModal = false">Close</v-btn>
+                        </td></tr>
+                      </tbody>
+                      
+                    </template>
+                  </v-simple-table>
+                </template>
+
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <v-bottom-sheet v-model="sheet">
+          <v-sheet
+            class="text-center"
+            height="200px"
+          >
+            <v-btn
+              class="mt-6"
+              text
+              color="red"
+              @click="sheet = !sheet"
+            >
+              close
+            </v-btn>
+            <div class="py-3">
+              <h1>
+                {{ errorText }}
+              </h1>
+            </div>
+          </v-sheet>
+        </v-bottom-sheet>
   </Layout>
 </template>
 
@@ -494,4 +646,8 @@ export default {
   margin-top: -58px;
   height: 58px;
 }
-</style>`
+.inactive {
+  opacity: 0.5;
+  pointer-events: none;
+} 
+</style>

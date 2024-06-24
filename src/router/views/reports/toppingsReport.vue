@@ -62,7 +62,18 @@ export default {
       nameRules: [(v) => !!v || " required"],
     };
   },
-
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "hrManager") {
+         vm.$router.push({path: "/reports/toppings-report"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   mounted() {
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;

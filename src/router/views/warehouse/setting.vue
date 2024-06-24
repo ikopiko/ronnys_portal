@@ -15,6 +15,18 @@ export default {
   components: {
     Layout,
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+         vm.$router.push({path: "/warehouse/setting"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   computed: {
     formTitle() {
       return this.editedWarehouseIndex === -1
@@ -65,6 +77,7 @@ export default {
   },
   data() {
     return {
+      isViewOnly: true,
       editItemRecipe: {},
       recipeModal:false,
       selectedItemRecipe: {},
@@ -206,6 +219,10 @@ export default {
     this.getTypes();
     this.getWarehouseTypes();
     this.roles()
+
+    if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager") {
+      this.isViewOnly = false;
+    }
      
   },
   methods: {
@@ -1229,6 +1246,7 @@ export default {
                         color="primary"
                         v-bind="attrs"
                         v-on="on"
+                        :disabled="isViewOnly"
                       >
                         <span
                           class="bx bx-plus font-size-16 align-middle me-2"
@@ -1342,7 +1360,7 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editItem(item)">
+                <v-icon :disabled="isViewOnly" small class="mr-2" @click="editItem(item)">
                   mdi-pencil
                 </v-icon>
                 <!-- <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon> -->
@@ -1372,6 +1390,7 @@ export default {
                         color="primary"
                         v-bind="attrs"
                         v-on="on"
+                        :disabled="isViewOnly"
                       >
                         <span
                           class="bx bx-plus font-size-16 align-middle me-2"
@@ -1472,7 +1491,7 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editwarehouseType(item)">
+                <v-icon :disabled="isViewOnly" small class="mr-2" @click="editwarehouseType(item)">
                   mdi-pencil
                 </v-icon>
                              </template>
@@ -1497,6 +1516,7 @@ export default {
                 size="sm"
                 variant="outline-primary"
                 @click="showProductModal = true"
+                :disabled="isViewOnly"
               >
                 <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                 Add
@@ -1514,7 +1534,7 @@ export default {
                 <v-tooltip top v-if="item.category_id == 2">
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="green">
+                        <v-btn icon x-small class="ma-2" :disabled="isViewOnly" color="green">
                           <v-icon small @click="viewRecipe(item)">
                             mdi-eye
                           </v-icon>
@@ -1526,7 +1546,7 @@ export default {
                 <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="grey">
+                        <v-btn icon x-small class="ma-2" :disabled="isViewOnly" color="grey">
                           <v-icon small @click="editProduct(item)">
                             mdi-pencil
                           </v-icon>
@@ -1538,7 +1558,7 @@ export default {
                 <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="red">
+                        <v-btn icon x-small class="ma-2" :disabled="isViewOnly" color="red">
                           <v-icon small @click="deleteProduct(item)">
                             mdi-delete
                           </v-icon>
@@ -1572,6 +1592,7 @@ export default {
                         color="primary"
                         v-bind="attrs"
                         v-on="on"
+                        :disabled="isViewOnly"
                       >
                         <span
                           class="bx bx-plus font-size-16 align-middle me-2"
@@ -1672,10 +1693,10 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editUnit(item)">
+                <v-icon :disabled="isViewOnly" small class="mr-2" @click="editUnit(item)">
                   mdi-pencil
                 </v-icon>
-                <v-icon small @click="deleteUnit(item)"> mdi-delete </v-icon>
+                <v-icon :disabled="isViewOnly" small @click="deleteUnit(item)"> mdi-delete </v-icon>
               </template>
             </v-data-table>
           </v-expansion-panel-content>
@@ -1702,6 +1723,7 @@ export default {
                         color="primary"
                         v-bind="attrs"
                         v-on="on"
+                        :disabled="isViewOnly"
                       >
                         <span
                           class="bx bx-plus font-size-16 align-middle me-2"
@@ -1802,10 +1824,10 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editCategory(item)">
+                <v-icon :disabled="isViewOnly" small class="mr-2" @click="editCategory(item)">
                   mdi-pencil
                 </v-icon>
-                <v-icon small @click="deleteCategory(item)"> mdi-delete </v-icon>
+                <v-icon :disabled="isViewOnly" small @click="deleteCategory(item)"> mdi-delete </v-icon>
               </template>
             </v-data-table>
           </v-expansion-panel-content>
@@ -1833,6 +1855,7 @@ export default {
                         color="primary"
                         v-bind="attrs"
                         v-on="on"
+                        :disabled="isViewOnly"
                       >
                         <span
                           class="bx bx-plus font-size-16 align-middle me-2"
@@ -1933,7 +1956,7 @@ export default {
                 </span>
               </template>
               <template  v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editType(item)">
+                <v-icon :disabled="isViewOnly" small class="mr-2" @click="editType(item)">
                   mdi-pencil
                 </v-icon>
               </template>

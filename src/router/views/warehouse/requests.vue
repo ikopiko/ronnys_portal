@@ -20,6 +20,18 @@ export default {
   page: {
     title: "Manage Warehouse",
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+         vm.$router.push({path: "/warehouse/requests"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   components: {
     Layout,
     requesModal,
@@ -69,7 +81,8 @@ export default {
   },
   data() {
     return {
-   branchOptions:null,
+      isViewOnly: true,
+      branchOptions:null,
        branch: null,
       supplyItems: [],
       productRecipe: {},
@@ -179,6 +192,10 @@ export default {
         this.branch = this.branchOptions[0]      
          this.getSupplyList(this.branch["value"]);
             });
+
+      if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager" || this.loggedUser.role == "hrManager") {
+        this.isViewOnly = false;
+      }
   },
   methods: {
     // eslint-disable-next-line no-unused-vars
@@ -666,6 +683,7 @@ export default {
                   size="sm"
                   variant="primary"
                   @click="supplyModal = true"
+                  :disabled="isViewOnly"
                 >
                   <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                   Add supply
@@ -695,7 +713,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="red">
+                        <v-btn icon x-small class="ma-2" color="red" :disabled="isViewOnly">
                           <v-icon small @click="wasteProduct(item)">
                             mdi-recycle
                           </v-icon>
@@ -707,7 +725,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="green">
+                        <v-btn icon x-small class="ma-2" color="green" :disabled="isViewOnly">
                           <v-icon small @click="productHistory(item)">
                             mdi-eye
                           </v-icon>
@@ -761,7 +779,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon color="success">
+                        <v-btn icon color="success" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"
@@ -812,6 +830,7 @@ export default {
                   size="sm"
                   variant="primary"
                   @click="sendRequestModal = true"
+                  :disabled="isViewOnly"
                 >
                   <i class="bx bx-plus font-size-16 align-middle me-2"></i>
                   Send Request
@@ -836,7 +855,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small class="ma-2" color="error">
+                        <v-btn icon x-small class="ma-2" color="error" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"
@@ -870,15 +889,6 @@ export default {
                 <v-spacer></v-spacer>
 
                 <!-- RECEIVED MODAL BUTTON -->
-
-                <!-- <b-button
-                  size="sm"
-                  variant="primary"
-                  @click="showProductModal = true"
-                >
-                  <i class="bx bx-plus font-size-16 align-middle me-2"></i>
-                  Received Request
-                </b-button> -->
               </v-card-title>
               <v-data-table
                 dense
@@ -903,7 +913,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }" v-if="item.status != 4">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon color="success">
+                        <v-btn icon color="success" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"
@@ -919,7 +929,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }" v-if="item.status != 4">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small color="error">
+                        <v-btn icon x-small color="error" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"
@@ -942,13 +952,14 @@ export default {
                   size="sm"
                   class="success"
                   @click="showAcceptListModal = true"
+                  :disabled="isViewOnly"
                 >
                   <i
                     class="bx bx-check-double font-size-16 align-middle me-2"
                   ></i>
                   Accept
                 </b-button>
-                <b-button size="sm" class="error ml-2" @click="rejectRequest()">
+                <b-button size="sm" class="error ml-2" @click="rejectRequest()" :disabled="isViewOnly">
                   <i class="bx bx-x font-size-16 align-middle me-2"></i>
                   Reject
                 </b-button>
@@ -997,7 +1008,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon color="warning">
+                        <v-btn icon color="warning" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"
@@ -1013,7 +1024,7 @@ export default {
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
                       <span v-bind="attrs" v-on="on">
-                        <v-btn icon x-small color="error">
+                        <v-btn icon x-small color="error" :disabled="isViewOnly">
                           <v-icon
                             small
                             class="mr-2"

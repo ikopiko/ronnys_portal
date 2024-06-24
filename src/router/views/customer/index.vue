@@ -14,6 +14,18 @@ export default {
     Layout,
     DatePicker,
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "hrManager" || role == "marketingManager") {
+         vm.$router.push({path: "/customer"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   computed: {},
   data() {
     return {

@@ -86,7 +86,9 @@ export default {
             return item.subItems !== undefined ? item.subItems.length > 0 : false;
         },
         hasRole(item){
-            return item.role == this.loggedUser.role || item.role == 'all' ? true : false;
+            var role = item.role.find((x) => x == this.loggedUser.role);
+            return role ? true : false;
+            // return item.role == this.loggedUser.role || item.role == 'all' ? true : false;
         },
 
         toggleMenu(event) {

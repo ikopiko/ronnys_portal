@@ -1,4 +1,4 @@
-`<script>
+<script>
 import axios from "axios";
 import Layout from "../../layouts/main";
 export default {
@@ -102,6 +102,18 @@ export default {
        
       ],
     };
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "operationalManager"
+        || role == "branchManager" || role == "hrManager") {
+         vm.$router.push({path: "/users"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
   },
   mounted() {
     this.loggedUser = this.$store.state.authfack.user;
@@ -246,8 +258,8 @@ export default {
           })
           .then((response) => {
             this.toggleSnackBar(response.data.data);
-            if(response.data.data == 'user deleted');
-              this.toggleDeleteDialog();
+            if(response.data.data == 'user deleted')
+                this.toggleDeleteDialog();
           });
     },
     getBranch(){

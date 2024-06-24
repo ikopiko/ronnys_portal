@@ -13,6 +13,18 @@ export default {
     Layout,
   },
   computed: {},
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      var role = vm.$store.state.authfack.user.role;
+       if (role == "admin" || role == "financialManager" || role == "operationalManager"
+        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+         vm.$router.push({path: "/warehouse/waybill"}).catch(()=>{});
+       }
+       else {
+         vm.$router.push({path: "/"}).catch(()=>{});
+       }
+    });
+  },
   watch: {
     selectproduct: function () {
       // eslint-disable-next-line no-console
@@ -23,6 +35,7 @@ export default {
   },
   data() {
     return {
+      isViewOnly: true,
       productList:[],
       selectproduct: [],
       showAddBarCode: false,
@@ -104,7 +117,11 @@ export default {
     this.TOKEN = this.loggedUser.token;
     this.getwaybillTypes();
     this.getwaybillList();
-      this.productslist();
+    this.productslist();
+
+    if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager") {
+      this.isViewOnly = false;
+    }
   },
   methods: {
 
@@ -469,6 +486,7 @@ export default {
                   elevation="0"
                   @click="addBarCode"
                   small
+                  :disabled="isViewOnly"
                   class="white--text text-capitalize"
                 >
                   <i class="bx bx-check"></i> Confirm Waybill
