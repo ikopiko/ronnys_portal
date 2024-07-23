@@ -354,9 +354,9 @@ export default {
       this.productName = item.name;
       this.productType = parseInt(item.category_id);
 
-      if(this.productType == 2) {
-        this.getRecipe(item);
-      }
+      //if(this.productType == 2) {
+      //  this.getRecipe(item);
+      //}
       this.productUnit = parseInt(m.length>0?m[0].id:"");
       this.productCategory = parseInt(item.products_category_id);
       this.editedProductIndex = item.id;
@@ -590,6 +590,8 @@ export default {
             };
             this.productValues.push(obj);
           })
+          // eslint-disable-next-line no-console
+          console.log(this.productValues)
           // this.productValues = response.data;
         });
     },
@@ -1090,8 +1092,8 @@ export default {
             var recipe3 = [];
             var tempObj3 = {};
             this.productValues.forEach(x => {
-              tempObj3.product_id = x.child_product_id;
-              tempObj3.qty = x.batchAmount;
+              tempObj3.product_id = x.id;
+              tempObj3.qty = x.recipeAmount;
               recipe3.push(tempObj3);
               tempObj3 = {};
             });
@@ -1162,7 +1164,7 @@ export default {
           if(this.productType == 2){
             this.productValues.forEach(x => {
               tempObj2.product_id = x.id;
-              tempObj2.qty = x.batchAmount;
+              tempObj2.qty = x.recipeAmount;
               recipe2.push(tempObj2);
               tempObj2 = {};
             });
@@ -2089,12 +2091,13 @@ export default {
                 <v-col cols="3" v-for="pv in productValues" :key="pv.id">
                   <v-text-field
                     class="font-size-12"
+                    
                     clearable
                     dense
-                    type=""
-                    v-model="pv.batchAmount"
+                    type="number"
+                    v-model="pv.recipeAmount"
                     :append-icon="pv.unit"
-                    :label="'Enter ' + pv.child_product_name + ' quantity'"
+                    :label="'Enter ' + pv.name + ' quantity'"
                   ></v-text-field>
                 </v-col>
               </v-row>

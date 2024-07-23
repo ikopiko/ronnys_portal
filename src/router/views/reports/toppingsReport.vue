@@ -85,7 +85,6 @@ export default {
         this.loader = true;
 
         this.json_data = this.supplyList = [];
-
         axios
           .request({
             method: "post",

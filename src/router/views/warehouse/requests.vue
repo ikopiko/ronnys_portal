@@ -107,7 +107,6 @@ export default {
       editSentProductsModal: false,
       snackbar: false,
       color: "default",
-      
       snackbarText: null,
       TOKEN: null,
       createIcon:null,

@@ -208,6 +208,7 @@ export default {
                         </v-list-item>
                         </v-list>
                     </div>
+                    
                     <div class="col-6">
                         <div class="row" 
                                 v-for="(product, index) in selectedProducts"

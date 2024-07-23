@@ -22,11 +22,12 @@ export default {
       modal: false,
     };
   },
+  
   mounted() {
     axios
       .request({
         method: "post",
-        url: tgit .$hostname + "warehouses/products-list",
+        url: this.$hostname + "warehouses/products-list",
         headers: {
           Authorization: "Bearer " + this.token,
         },

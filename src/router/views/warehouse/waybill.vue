@@ -35,6 +35,11 @@ export default {
   },
   data() {
     return {
+    units: 
+        {
+           "1": "ცალი","2":"კგ","3":"გრამი", "4":"ლიტრი","5":"ტონა","7":"სანტიმეტრი","8":"მეტრი","9":"კილომეტრი","10":"კვ.სმ","11":"კვ.მ","12":"მ³","13":"მილილიტრი","14":"შეკვრა","15":"აბი","16":"მომსახურება","19":"კვ/სთ","99":"სხვა"
+        },
+      
       isViewOnly: true,
       productList:[],
       selectproduct: [],
@@ -86,7 +91,7 @@ export default {
         { text: "IS CONFIRMED", align: "start", value: "IS_CONFIRMED" },
         { text: "TYPE", value: "TYPE" },
         { text: "SELLER_NAME", value: "SELLER_NAME" },
-        { text: "AMOUNT", value: "FULL_AMOUNT" },
+        { text: "Total Amount", value: "FULL_AMOUNT" },
         { text: "DRIVER", value: "DRIVER_NAME" },
         { text: "CAR_NUMBER", value: "CAR_NUMBER" },
         { text: "START_ADDRESS", value: "START_ADDRESS" },
@@ -96,17 +101,18 @@ export default {
         { text: "WAYBILL_COMMENT", value: "WAYBILL_COMMENT" },
       ],
       waybillDetailHeader: [
-        { text: "W_NAME", align: "start", value: "W_NAME" },
-        { text: "QUANTITY", align: "start", value: "QUANTITY" },
+        { text: "Product Name", align: "start", value: "W_NAME" },
+        { text: "Quantity", align: "start", value: "QUANTITY" },
         { text: "Barcode", align: "start", value: "BAR_CODE" },
-        { text: "PRICE", align: "start", value: "PRICE" },
-        { text: "AMOUNT", align: "start", value: "AMOUNT" },
+        { text: "Price", align: "start", value: "PRICE" },
+        { text: "Full Amount", align: "start", value: "AMOUNT"},
       ],
       nameRules: [(v) => !!v || " required"],
     };
   },
 
   mounted() {
+    // eslint-disable-next-line no-console
     this.lastday.setDate(this.lastday.getDate() - 1);
     this.date = [
       moment(this.lastday).format("YYYY-MM-DD"),
@@ -422,6 +428,16 @@ export default {
                   item-key="ID"
                   v-model="selectproduct"
                 >
+                <template v-slot:[`item.QUANTITY`]="{ item }">
+                  {{item.QUANTITY+" "+units[item.UNIT_ID]}}
+                </template>
+                <template v-slot:[`item.PRICE`]="{ item }">
+                  {{item.PRICE+" ლარი"}}
+                </template>
+                  <template v-slot:[`item.AMOUNT`]="{ item }">
+                  {{item.AMOUNT+" ლარი"}}
+                </template>
+
                 </v-data-table>
               </v-col>
                 <!-- <v-col cols="12" align="right">
@@ -439,7 +455,7 @@ export default {
               <v-form ref="supplyForm" lazy-validation>
               <v-col cols="12">
                 <v-row v-for="pv in waybillGoodsList" :key="pv.id">
-                  <v-col cols="4">
+                  <v-col cols="3">
                     <v-text-field
                       class=""
                       clearable
@@ -457,7 +473,7 @@ export default {
                       dense
                       v-model="pv.weight"
                       :label="'Enter Weight'"
-                      :append-icon="pv.unit_name"
+                      :append-icon="pv.unit_name?pv.unit_name:'კგ'"
                     ></v-text-field>
                   </v-col>
 
@@ -472,9 +488,16 @@ export default {
                       label="Choose product"
                       clearable></v-autocomplete>
                   </v-col>
+                  <v-col cols="1">
+                    <v-checkbox label="vat"  v-model="pv.VAT_TYPE"></v-checkbox>
+                  </v-col>
                   <v-col>
-                    full weight: 
+                    full weight:<br> 
                     {{pv.weight*pv.QUANTITY}} {{pv.unit_name}}
+                  </v-col>
+                  <v-col>
+                    Final price:<br> 
+                    {{pv.VAT_TYPE?( Number.parseFloat(pv.AMOUNT/1.18).toFixed(2)):pv.AMOUNT}}
                   </v-col>
                 </v-row>
               </v-col>
