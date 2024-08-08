@@ -17,6 +17,10 @@ export default {
   computed: {},
   data() {
     return {
+      menu: false,
+      selectedUser: {},
+      tabelUserData: [],
+      tabelUserModal: false,
       sheet: false,
       errorText: '',
       detailedInfoModal: false,
@@ -37,6 +41,7 @@ export default {
         moment(new Date()).format("YYYY-MM-DD"),
         moment(new Date()).format("YYYY-MM-DD"),
       ],
+      tabelDate: moment(new Date()).format("YYYY-MM-DD"),
       branchID: '',
       validSearch: true,
       loader: false,
@@ -162,6 +167,23 @@ export default {
     },
   },
   methods: {
+    addTabel(){
+      const TOKEN = this.loggedUser.token;
+      axios
+          .request({
+            method: "post",
+            url:
+              this.$hostname + "timesheet/tabellist",
+            headers: {
+              Authorization: "Bearer " + TOKEN,
+            },
+          })
+          .then((response) => {
+            this.tabelUserData = response.data.data;
+            this.tabelUserModal = true;
+          });
+
+    },
     editItemFinish(item){
       if(item.comment != ''){
         const TOKEN = this.loggedUser.token;
@@ -350,10 +372,16 @@ export default {
               label="Select branch"
             ></v-autocomplete>
           </v-col>
-          <v-col cols="2">
+          <v-col cols="1">
             <v-btn color="primary" elevation="0" @click="getReport()">
               <v-icon small> mdi-magnify </v-icon>
               Search
+            </v-btn>
+          </v-col>
+          <v-col cols="1" class="mx-3">
+            <v-btn color="success" elevation="0" @click="addTabel()">
+              <v-icon small> mdi-plus </v-icon>
+              Add
             </v-btn>
           </v-col>
         </v-row>
@@ -606,6 +634,105 @@ export default {
                         <tr><td>
                           <v-btn @click="detailedInfoModal = false">Close</v-btn>
                         </td></tr>
+                      </tbody>
+                      
+                    </template>
+                  </v-simple-table>
+                </template>
+
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog
+        v-model="tabelUserModal"
+        max-width="800px"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="headline">Add User Tabel</span>
+
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="4">
+                &nbsp;
+              </v-col>
+              <v-col cols="8">
+                <v-autocomplete
+                    v-model="selectedUser"
+                    :items="tabelUserData"
+                    item-text="username"
+                    :auto-select-first="true"
+                    hide-no-data 
+                    return-object
+                  ></v-autocomplete>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="3">
+                <v-menu
+                  v-model="menu"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="tabelDate"
+                      label="Select Date"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="tabelDate"
+                    @input="menu = false"
+                  ></v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="9">
+
+                <template>
+                  <v-simple-table height="300px">
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Name
+                          </th> 
+                          <th class="text-left">
+                            State
+                          </th>
+                          <th class="text-left">
+                            Start Date
+                          </th>
+                          <th class="text-left">
+                            Comment
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- <tr v-for="(item, index) in detailedInfo" :key="index">
+                          <td>{{ item.user_name }}</td>
+                          <td>{{ item.state }}</td>
+                          <td>
+                          <input type="text" class="form-control" v-model="item.start_date" placeholder="edit me" @keypress="isNumber($event)" />
+                          </td>
+                          <td><input type="text" class="form-control" placeholder="Comment" v-model="item.comment"></td>
+                          <td><v-btn @click="editItemFinish(item)">Edit Item</v-btn></td>
+                        </tr> -->
+                        <tr>
+                          <td>
+                            <v-btn @click="tabelUserModal = false">Close</v-btn>
+                          </td>
+                        </tr>
                       </tbody>
                       
                     </template>

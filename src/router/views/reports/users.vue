@@ -19,7 +19,10 @@ export default {
       confirmPassword: '',
       selectedBranch: '',
       selectedRole: '',
+      selectedDicsount: false,
       selectedUser: {},
+      selectedStatus: '',
+      filteredStatus: '',
       userData: {
         username: '',
         email: '',
@@ -54,9 +57,10 @@ export default {
         { value: 5, text: "Avlabari", id: 5 }
       ],
       userList: [],
+      rawList: [],
       branchList: [],
       roleList: [],
-      
+      userStatusList: [],
       userHeaders: [
         {
           value: "branch",
@@ -123,9 +127,16 @@ export default {
     this.getReport()
     this.getBranch()
     this.getRoles()
+    this.getUserStatus()
   },
   watch: {
-
+    filteredStatus(val) {
+      if(val == null){
+        this.userList = this.rawList;
+      } else {
+        this.userList = this.rawList.filter((x) => x.status == val);
+      }
+    },
   },
   computed: {
     passwordConfirmationRule() {
@@ -155,6 +166,12 @@ export default {
         this.userData = item;
         this.selectedBranch = Number(item.branch_id);
         this.selectedRole = item.role;
+        this.selectedStatus = Number(item.status);
+        if(item.discount == "Team") {
+          this.selectedDicsount = true;
+        } else {
+          this.selectedDicsount = false;
+        }
       } else {
         this.userData = {
           username: '',
@@ -213,6 +230,12 @@ export default {
     },
     editUser(){
       if (this.$refs.formEdit.validate()) {
+        var discount_temp = '';
+        if(this.selectedDicsount == true){
+          discount_temp = 'Team';
+        }  else {
+          discount_temp = '';
+        }
         axios
           .request({
             method: "post",
@@ -230,10 +253,14 @@ export default {
               role: this.selectedRole,
               branch_id: this.selectedBranch,
               password: this.confirmPassword,
+              // password: '123',
+              discount: discount_temp,
+              status: this.selectedStatus,
             }
           })
           .then((response) => {
             this.toggleSnackBar(response.data);
+            this.toggleEditDialog();
             if(response.data == "user updated"){
               this.toggleEditDialog();
             }
@@ -294,6 +321,24 @@ export default {
              
         });
     },
+    getUserStatus(){
+      axios
+        .request({
+          method: "post",
+          url: this.$hostname + "usermax/statuslist",
+          headers: {
+            Authorization: "Bearer " + this.TOKEN,
+          },
+        })
+        .then((response) => {
+          this.loader = false;
+          // eslint-disable-next-line no-console
+          this.userStatusList = response.data.data; 
+             
+        });
+    },
+
+
 
     getReport() {
         this.loader = true;
@@ -322,6 +367,8 @@ export default {
             this.userList.forEach(x => {
               x.created_at = this.formatDate(Number(x.created_at * 1000));
             });
+
+            this.rawList = this.userList;
           
           });
     },
@@ -350,7 +397,7 @@ export default {
     <v-card>
       <v-form ref="form1">
         <v-row>
-          <v-col cols="4" class="ml-2">
+          <v-col cols="3" class="ml-2">
             <v-text-field
             dense
             v-model="userSearch"
@@ -360,7 +407,7 @@ export default {
             hide-details
           ></v-text-field>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="2">
             <v-autocomplete
               clearable
               v-model="selectedBranch"
@@ -370,12 +417,23 @@ export default {
             ></v-autocomplete>
           </v-col>
           <v-col cols="2">
+            <v-autocomplete
+              clearable
+              v-model="filteredStatus"
+              :items="userStatusList"
+              item-text="status_name"
+              item-value="id"
+              dense
+              label="Select Status"
+            ></v-autocomplete>
+          </v-col>
+          <v-col cols="2">
             <v-btn color="primary" elevation="0" @click="getReport()">
               <v-icon small> mdi-magnify </v-icon>
               Search
             </v-btn>
           </v-col>
-          <v-col cols="1">
+          <v-col cols="2">
             <v-btn color="primary" elevation="0" @click="toggleAddDialog()">
               <v-icon small> mdi-plus </v-icon>
               Add
@@ -662,6 +720,25 @@ export default {
                   item-text="name"
                   :rules="textRules"
                   label="Role"
+                  required
+                ></v-select>  
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="6">
+                <v-checkbox
+                  v-model="selectedDicsount"
+                  :label="'Team Discount'"
+                ></v-checkbox>
+              </v-col>
+              <v-col cols="6">
+                <v-select
+                  v-model="selectedStatus"
+                  :items="userStatusList"
+                  item-text="status_name"
+                  item-value="id"
+                  :rules="textRules"
+                  label="User Status"
                   required
                 ></v-select>  
               </v-col>
