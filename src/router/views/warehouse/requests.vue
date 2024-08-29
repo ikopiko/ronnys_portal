@@ -115,6 +115,8 @@ export default {
       supplyModal: false,
       supplyId: {},
       supplyQty: null,
+      supplyPrice: null,
+      supplyVat: true,
       portionQty: 1,
       portionAmount:1,
       recieveProductList: [],
@@ -1125,6 +1127,18 @@ export default {
                   required
                 ></v-text-field>
               </v-col>
+                 <v-col cols="4">
+                <v-text-field
+                  dense
+                  v-model="supplyPrice"
+                  :rules="[(v) => !!v || 'Price is required']"
+                  label="Price"
+                  required
+                ></v-text-field>
+              </v-col>
+                 <v-col cols="4">
+                    <v-checkbox label="vat"  v-model="supplyVat"></v-checkbox>
+                  </v-col>
              
 
             </v-row>

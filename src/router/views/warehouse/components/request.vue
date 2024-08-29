@@ -15,14 +15,64 @@ export default {
       color: "default",
       snackbarText: null,
       request: [],
-      productValues: [],
+      productValues: [
+        { id: 168, name: "მყარი ყველი გატარებული", unit: "კგ" },
+        { id: 2, name: "გატარებული ყველი (შებოლილი)", unit: "კგ" },
+        { id: 7, name: "ობიანი ყველი", unit: "კგ" },
+        { id: 167, name: "მოცარელა გატარებული", unit: "კგ" },
+        { id: 10, name: "სალიამი პიკანტე (პეპერონი)", unit: "კგ" },
+        { id: 161, name: "გრილის ქათამი პორციებით(500გრ)", unit: "ცალი" },
+        {id: 162,name: "ქათამი ბარბიქიუსთვის პორციებით ბბქ (300გრ)",unit: "ცალი"},
+        { id: 58, name: "იტალიური სოსიჯის სუნელი", unit: "კგ" },
+        { id: 16, name: "ანჩოუსის ფილე ", unit: "კგ" },
+        { id: 19, name: "ზეთისხილი შავი (დაჭრილი)", unit: "კგ" },
+        { id: 20, name: "ზეთისხილი მწვანე (უკურკო)", unit: "კგ" },
+        { id: 21, name: "ანანასი (850 მლ)", unit: "კგ" },
+        { id: 170, name: "მოთუშული სოკო (50 გრ)", unit: "ცალი" },
+        { id: 169, name: "მოთუშული სოკო (0,150გრ)", unit: "ცალი" },
+        { id: 102, name: "ზეთი", unit: "ლიტრი" },
+        { id: "25", name: " გარჩეული ხახვი ", unit: "კგ" },
+        { id: "26", name: "გარჩეული ბულგარული", unit: "კგ" },
+        { id: "228", name: "პომიდორი (ყუნწის გარეშე)", unit: "კგ" },
+        { id: "28", name: "გასუფთავებული ნიორი", unit: "კგ" },
+        { id: "29", name: "მწარე მწ. წიწაკა ცოცხალი", unit: "კგ" },
+        { id: "34", name: "ჰალაპენიო", unit: "კგ" },
+        { id: "35", name: "ტომატი (სოუსი) მარინერა", unit: "კგ" },
+        { id: "172", name: "რენჩ სოუსი (40გრ)", unit: "ცალი" },
+        { id: "171", name: "რენჩ სოუსი (70გრ)", unit: "ცალი" },
+        { id: "38", name: "მწარე სოუსი", unit: "ლიტრი" },
+        { id: "42", name: "მჭადის ფქვილი", unit: "კგ" },
+        { id: "43", name: "ვეჯის სუნელები", unit: "კგ" },
+        { id: "44", name: "ნიორი გრანულა", unit: "კგ" },
+        { id: "45", name: "წითელი წიწაკა დაღერღილი", unit: "კგ" },
+        { id: "49", name: "იოდიზირებული მარილი", unit: "კგ" },
+        { id: "50", name: "საფუარი (100გრ)", unit: "ცალი" },
+        { id: "134", name: "ქუქის ბურთულები (75გრ)", unit: "ცალი" },
+        { id: "61", name: " შოკოლადის ფირფიტები(ქუქის)", unit: "კგ" },
+        { id: "66", name: "ყავა მოხალული (0.09 გრ)", unit: "ცალი" },
+        { id: "244", name: "მწვანე ჩაი (შეზავებული)", unit: "კგ" },
+        { id: "202", name: "მწვანე ჩაი", unit: "კგ" },
+        { id: "195", name: "ჩერი კოლა", unit: "ცალი" },
+        { id: "187", name: "რონის კოლა", unit: "ცალი" },
+        { id: "199", name: "ლაიმი", unit: "ცალი" },
+        { id: "198", name: "ფორთოხალი", unit: "ცალი" },
+        { id: "200", name: "რუთ ბიარი", unit: "ცალი" },
+        { id: "197", name: "ვანილის კოლა", unit: "ცალი" },
+        { id: "196", name: "ჩერი ვანილის კოლა", unit: "ცალი" },
+        { id: "76", name: "მ/ყუთი  L 0.68მ2 25ც", unit: "ცალი" },
+        { id: "78", name: "მ/ყუთი S 0.24მ2 100ც", unit: "ცალი" },
+        { id: "77", name: "მ/ყუთი M 0.32მ2 50ც", unit: "ცალი" },
+        { id: "86", name: "გამოსაცხობი ქაღალდი 40*60 ", unit: "კგ" },
+        { id: "88", name: "პარკი ერთჯერადი", unit: "შეკვრა" },
+        { id: "87", name: "პარკი ყურიანი", unit: "შეკვრა" },
+      ],
       branchValue: "",
       branchList: [],
       productList: [],
       modal: false,
     };
   },
-  
+
   mounted() {
     axios
       .request({
@@ -52,10 +102,10 @@ export default {
       });
   },
   methods: {
-    closeModal(){
+    closeModal() {
       this.productValues = [];
       this.branchValue = "";
-      this.$emit('closeModal');
+      this.$emit("closeModal");
     },
     test() {
       this.productValues.forEach((x) => {
@@ -80,7 +130,7 @@ export default {
           this.snackbar = true;
           this.responseData = response;
           this.request = [];
-        
+
           this.closeModal();
         });
     },
@@ -111,7 +161,7 @@ export default {
       <v-card-text>
         <v-form ref="supplyForm" lazy-validation>
           <v-row>
-            <v-col cols="8">
+            <v-col cols="8" class="d-none">
               <v-autocomplete
                 v-model="productValues"
                 :items="productList"
@@ -138,14 +188,24 @@ export default {
             </v-col>
             <v-col cols="12">
               <v-row>
-                <v-col cols="3" v-for="pv in productValues" :key="pv.id">
+                <v-col
+                  style="
+                    margin-top: 0;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                    padding-top: 0;
+                  "
+                  cols="12"
+                  v-for="pv in productValues"
+                  :key="pv.id"
+                >
                   <v-text-field
                     class=""
                     clearable
                     dense
                     v-model="pv.newQnty"
                     :append-icon="pv.unit"
-                    :label="'Enter ' + pv.name + ' quantity'"
+                    :label="pv.name + ' ' + pv.unit"
                   ></v-text-field>
                 </v-col>
               </v-row>
