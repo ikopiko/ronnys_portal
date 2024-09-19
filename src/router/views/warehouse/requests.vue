@@ -193,8 +193,11 @@ export default {
          this.getSupplyList(this.branch["value"]);
             });
 
-      if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager" || this.loggedUser.role == "hrManager") {
-        this.isViewOnly = false;
+      if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager" || this.loggedUser.role == "hrManager"
+        || this.loggedUser.role == "financialManager" || this.loggedUser.role == "operationalManager" 
+        || this.loggedUser.role == "branchManager") {
+        
+          this.isViewOnly = false;
       }
   },
   methods: {
