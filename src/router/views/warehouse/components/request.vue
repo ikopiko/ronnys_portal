@@ -161,7 +161,7 @@ export default {
       <v-card-text>
         <v-form ref="supplyForm" lazy-validation>
           <v-row>
-            <v-col cols="8" class="d-none">
+            <v-col cols="8">
               <v-autocomplete
                 v-model="productValues"
                 :items="productList"
