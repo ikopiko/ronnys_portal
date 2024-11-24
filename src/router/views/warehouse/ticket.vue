@@ -65,14 +65,13 @@ export default {
   },
   data() {
     return {
-      showAcceptRecieveProductsBtn: false,
       seletedticket: null,
-
+      showAcceptListModal:false,
       snackbar: false,
       color: "default",
       snackbarText: null,
       TOKEN: null,
-     
+      seletedReceiveItems:[],
       warehouseId: null,
 
       ticketList: [],
@@ -100,8 +99,34 @@ export default {
     this.getTicketList();
   },
   methods: {
+    solveTicket(){
+      // eslint-disable-next-line no-console
+      
+      axios
+            .request({
+                method: "post",
+                url:
+                this.$hostname + "warehouses/solve-tickets",
+                headers: {
+                Authorization: "Bearer " + this.TOKEN,
+                },
+                data: this.seletedReceiveItems[0]
+            })
+            .then(() => {
+              this.color = "success";
+              this.snackbarText = "ყველაფერი რიგზეა";
+              this.snackbar = true;
+              this.showAcceptListModal = false
+              this.getTicketList()
+            });
 
-
+    },
+    acceptRecieveProductsSingle(item){
+      this.showAcceptListModal = true
+      this.seletedReceiveItems = [item]
+      // eslint-disable-next-line no-console
+      console.log(item)
+    },
     getTicketList() {
       var bodyFormData = new FormData();
       bodyFormData.set("warehouse_id", this.warehouseId);
@@ -143,7 +168,6 @@ export default {
         </v-card-title>
         <v-data-table
           dense
-          show-select
           :headers="ticketHeaders"
           :items="ticketList"
           :items-per-page="10"
@@ -166,105 +190,15 @@ export default {
                   </v-btn>
                 </span>
               </template>
-              <span>Accept Request</span>
+              <span>Solve Ticket</span>
             </v-tooltip>
           </template>
         </v-data-table>
-        <div
-          class="table-footer-prepend d-flex align-center"
-          v-if="showAcceptRecieveProductsBtn"
-        >
-          <b-button
-            size="sm"
-            class="success"
-            @click="showRecieveProductsModal = true"
-          >
-            <i class="bx bx-check-double font-size-16 align-middle me-2"></i>
-            Accept
-          </b-button>
-        </div>
+       
       </v-card-text>
     </v-card>
 
-    <v-dialog v-model="supplyModal" max-width="800">
-      <v-card>
-        <v-toolbar color="white" elevation="0">
-          <span class="text-h6"> Add supply</span>
-          <v-spacer></v-spacer>
-          <v-card-actions class="justify-end">
-            <v-btn @click="supplyModal = false" icon small color="gray">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-toolbar>
 
-        <hr />
-        <v-card-text>
-          <v-form ref="supplyForm" lazy-validation>
-            <v-row>
-              <v-col cols="4">
-                <v-autocomplete
-                  v-model="supplyId"
-                  :items="productList"
-                  item-text="name"
-                  item-value="id"
-                  dense
-                  clearable
-                  :rules="[(v) => !!v || 'Supply is required']"
-                  label="Select Product"
-                ></v-autocomplete>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  dense
-                  v-model="supplyQty"
-                  :rules="[(v) => !!v || 'Quantity is required']"
-                  label="Quantity"
-                  required
-                  :suffix="supplyMinQty"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  dense
-                  :rules="[(v) => !!v || 'Minimum Quantity is required']"
-                  label="Minimum amount"
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-card-text>
-        <hr />
-        <v-card-actions>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="success me-2"
-            elevation="0"
-            @click="addSupply"
-            small
-            class="white--text text-capitalize"
-          >
-            <i class="bx bx-save"></i> add
-          </v-btn>
-
-          <v-btn
-            elevation="0"
-            color="red"
-            small
-            class="white--text text-capitalize"
-            @click="cancelSupply"
-          >
-            <i class="bx bx-x-circle"></i> Cancel
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <v-dialog v-model="showAcceptListModal" max-width="800">
       <v-card>
@@ -282,7 +216,7 @@ export default {
         <v-card-text>
           <v-row>
             <v-col
-              cols="4"
+              cols="12"
               v-for="(pv, key) in seletedReceiveItems"
               :key="pv.id"
             >
@@ -291,9 +225,9 @@ export default {
                 clearable
                 @click:clear="onClearClicked(key)"
                 dense
-                v-model="pv.quantity"
+                v-model="pv.recieved_quantity"
                 :append-icon="pv.unit"
-                :label="'Enter ' + pv.product_name + ' quantity'"
+                :label="'Enter ' + pv.product_name + ' Real quantity'"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -308,7 +242,7 @@ export default {
           <v-btn
             color="success me-2"
             elevation="0"
-            @click="acceptRequest"
+            @click="solveTicket"
             small
             class="white--text text-capitalize"
           >
@@ -327,135 +261,7 @@ export default {
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="showRecieveProductsModal" max-width="800">
-      <v-card>
-        <v-toolbar color="white" elevation="0">
-          <span class="text-h6"> Receive this items?</span>
-          <v-spacer></v-spacer>
-          <v-card-actions class="justify-end">
-            <v-btn
-              @click="showRecieveProductsModal = false"
-              icon
-              small
-              color="gray"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-toolbar>
 
-        <hr />
-        <v-card-text>
-          <v-row>
-            <v-col
-              cols="4"
-              v-for="pv in seletedticket"
-              :key="pv.id"
-            >
-              <v-text-field
-                class=""
-                clearable
-                dense
-                v-model="pv.quantity"
-                :append-icon="pv.unit"
-                :label="'Enter ' + pv.product_name + ' quantity'"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <hr />
-        <v-card-actions>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="success me-2"
-            elevation="0"
-            @click="acceptRecieveProducts"
-            small
-            class="white--text text-capitalize"
-          >
-            <i class="bx bx-check"></i> Yes
-          </v-btn>
-
-          <v-btn
-            elevation="0"
-            color="red"
-            small
-            class="white--text text-capitalize"
-            @click="showRecieveProductsModal = false"
-          >
-            <i class="bx bx-x"></i> No
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="editSentProductsModal" max-width="800">
-      <v-card>
-        <v-toolbar color="white" elevation="0">
-          <span class="text-h6"> Edit sent products</span>
-          <v-spacer></v-spacer>
-          <v-card-actions class="justify-end">
-            <v-btn
-              @click="editSentProductsModal = false"
-              icon
-              small
-              color="gray"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-actions>
-        </v-toolbar>
-
-        <hr />
-        <v-card-text>
-          <v-row>
-            <v-col cols="4" v-for="pv in sentProductsList" :key="pv.id">
-              <v-text-field
-                class=""
-                clearable
-                dense
-                v-model="pv.quantity"
-                :append-icon="pv.unit"
-                :label="'Enter ' + pv.product_name + ' quantity'"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <hr />
-        <v-card-actions>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn
-            color="success me-2"
-            elevation="0"
-            @click="editSentRequest"
-            small
-            class="white--text text-capitalize"
-          >
-            <i class="bx bx-check"></i> Yes
-          </v-btn>
-
-          <v-btn
-            elevation="0"
-            color="red"
-            small
-            class="white--text text-capitalize"
-            @click="editSentProductsModal = false"
-          >
-            <i class="bx bx-x"></i> No
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <v-snackbar v-model="snackbar" :color="color" elevation="5">
       {{ snackbarText }}
