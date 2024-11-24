@@ -68,7 +68,7 @@ export default {
         "Username": "user_name",
         "Start Work": "startwork",
         "End Work": "endwork",
-        "Work Time":"worktime",
+        "Work Hours":"workHours",
         "Start Break": "startbreak",
         "End Break": "endbreak",
         "Break Time": "breaktime",
@@ -144,7 +144,7 @@ export default {
     next(vm => {
       var role = vm.$store.state.authfack.user.role;
        if (role == "admin" || role == "financialManager" || role == "operationalManager"
-        || role == "branchManager" || role == "hrManager") {
+        || role == "branchManager" || role == "viceManager" || role == "hrManager") {
          vm.$router.push({path: "/reports/timetable"}).catch(()=>{});
        }
        else {
@@ -327,14 +327,18 @@ export default {
             // eslint-disable-next-line no-console
             this.tabelList = this.json_data = response.data.data;
             
-            // this.tabelList.forEach(x => {
-            //   x.workHours = (Number(x.worktime) / 60).toFixed(2);
-            //   x.startwork = this.formatDate(Number(x.startwork));
-            //   x.endwork = this.formatDate(Number(x.endwork));
-            //   x.endbreak = this.formatDate(Number(x.endbreak));
-            //   x.startbreak = this.formatDate(Number(x.startbreak));
-            // });
+            this.tabelList.forEach(x => {
+              // x.workHours = (Number(x.worktime) / 60).toFixed(2);
+              const hours = Math.floor(x.worktime / 60);
+              const minutes = Math.floor((x.worktime % 60));
 
+              if(hours == 0 && minutes == 0){
+                x.workHours = "";
+              } else {
+                x.workHours = hours + "H, " + minutes + "M";
+              }
+            });
+            
           
           });
       }

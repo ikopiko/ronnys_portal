@@ -105,13 +105,13 @@ export default {
         { text: 'Actions', value: 'actions', sortable: false },
        
       ],
-    };
+  };
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {
       var role = vm.$store.state.authfack.user.role;
        if (role == "admin" || role == "operationalManager"
-        || role == "branchManager" || role == "hrManager") {
+        || role == "branchManager" || role == "viceManager" || role == "hrManager") {
          vm.$router.push({path: "/users"}).catch(()=>{});
        }
        else {

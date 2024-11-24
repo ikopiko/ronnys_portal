@@ -24,7 +24,7 @@ export default {
     next(vm => {
       var role = vm.$store.state.authfack.user.role;
        if (role == "admin" || role == "financialManager" || role == "operationalManager"
-        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+        || role == "branchManager" || role == "viceManager" || role == "inventoryManager" || role == "hrManager") {
          vm.$router.push({path: "/warehouse/requests"}).catch(()=>{});
        }
        else {
@@ -196,7 +196,7 @@ export default {
             });
 
       if(this.loggedUser.role == "admin" || this.loggedUser.role == "inventoryManager" || this.loggedUser.role == "hrManager"
-        || this.loggedUser.role == "financialManager" || this.loggedUser.role == "operationalManager" 
+        || this.loggedUser.role == "financialManager" || this.loggedUser.role == 'viceManager' || this.loggedUser.role == "operationalManager" 
         || this.loggedUser.role == "branchManager") {
         
           this.isViewOnly = false;

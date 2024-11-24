@@ -17,7 +17,7 @@ export default {
     next(vm => {
       var role = vm.$store.state.authfack.user.role;
        if (role == "admin" || role == "financialManager" || role == "operationalManager"
-        || role == "branchManager" || role == "inventoryManager" || role == "hrManager") {
+        || role == "branchManager" || role == "viceManager" || role == "inventoryManager" || role == "hrManager") {
          vm.$router.push({path: "/warehouse/waybill"}).catch(()=>{});
        }
        else {
