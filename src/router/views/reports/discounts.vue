@@ -54,13 +54,7 @@ export default {
       snackbarText: null,
       TOKEN: null,
       selectedBranch: null,
-      branchOptions: [
-        { value: "Saburtalo", text: "Saburtalo" },
-        { value: "Vake", text: "Vake" },
-        { value: "Digomi", text: "Digomi" },
-        { value: "Gldani", text: "Gldani" },
-        { value: "Avlabari", text: "Avlabari" }
-      ],
+      branchOptions: [],
       warehouseId: null,
       supplyList: [],
       suppliesSearch: "",
@@ -160,6 +154,20 @@ export default {
     this.loggedUser = this.$store.state.authfack.user;
     this.warehouseId = this.loggedUser.warehouseId;
     this.TOKEN = this.loggedUser.token;
+    axios
+      .request({
+        method: "post",
+        url: this.$hostname + "warehouses/branch-list-for-portal",
+        headers: {
+          Authorization: "Bearer " + this.TOKEN,
+        },
+      })
+      .then((response) => {
+        this.branchOptions = response.data;
+        if(this.branchOptions.length ==1)
+        this.branch = this.branchOptions[0]      
+        this.getReport(this.branch)
+      });
 
   axios
       .request({
@@ -174,7 +182,7 @@ export default {
         this.orderStatuses = response.data.data
       });
 
-    this.getReport()
+   
   },
   methods: {
          sumField(key) {
@@ -219,7 +227,7 @@ export default {
                 
           }
     },
-    getReport() {
+    getReport(br) {
       
       if (this.$refs.searchForm.validate()) {
         this.loader = true;
@@ -236,7 +244,7 @@ export default {
             },
             data: {
               day: this.date,
-              branch: this.branch
+              branch: br!=null && typeof br === 'object'? br["text"]:br
             },
           })
           .then((response) => {
@@ -289,7 +297,7 @@ export default {
             ></v-autocomplete>
           </v-col>
           <v-col cols="2">
-            <v-btn color="primary" elevation="0" @click="getReport()">
+            <v-btn color="primary" elevation="0" @click="getReport(branch)">
               <v-icon small> mdi-magnify </v-icon>
               Search
             </v-btn>

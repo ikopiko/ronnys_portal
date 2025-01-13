@@ -50,7 +50,7 @@ export const menuItems = [
         role: ["financialManager", "operationalManager", "branchManager", "viceManager", "hrManager", "admin"],
     },
     {
-        id: 6,
+        id: 46,
         label: "Timeclock sum report",
         icon: "bxs-time",
         link: "/reports/timetablesum",
