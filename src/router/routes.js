@@ -22,6 +22,12 @@ export default [
     component: () => import('./views/reports/timetableReport')
   },
   {
+    path: '/reports/timetablesum',
+    name: 'timetableSum',
+    meta: { authRequired: true },
+    component: () => import('./views/reports/timeTableSum')
+  },
+  {
     path: '/users',
     name: 'Users',
     meta: { authRequired: true },

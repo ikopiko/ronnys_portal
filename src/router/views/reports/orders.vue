@@ -37,6 +37,7 @@ export default {
       modalDiscType:null,
       modalDisc:null,
       modalCustomer: null,
+      modalComment: null,
       orderStatuses: [],
       status: "1,2,3,4,5,6,7,8,9,10",
       detailModal: false,
@@ -103,6 +104,11 @@ export default {
         {
           value: "customer.name",
           text: "Customer Name",
+          sortable: true,
+        },
+        {
+          value: "customer.comment",
+          text: "Customer Comment",
           sortable: true,
         },
         {
@@ -194,11 +200,11 @@ export default {
             this.modalDiscType  = item.order_data.discountName
             this.modalDisc = item.order_data.discount+this.discount(item,"discname")
             this.modalCustomer =item.order_data.customer.name
+            this.modalComment =item.order_data.customer.comment
             this.order_data = item.order_data.items
             this.modalTotalPrice = item.order_data.totalPrice
             this.modalDiscount =  (item.total_price-item.totalDue).toFixed(2)
             this.modalTotalDue = item.totalDue
-            this.detailModal = true
             this.detailModal = true
             });
           
@@ -419,6 +425,7 @@ export default {
               <div>Discount Type: <span class="font-size-15 font-weight-bold text-muted">{{modalDiscType}}</span></div>
                 <div>Discount: <span class="font-size-15 font-weight-bold text-muted">{{modalDisc}}</span></div>
                 <div>Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{modalCustomer}}</span></div>
+                <div>Customer Comment: <span class="font-size-15 font-weight-bold text-muted">{{modalComment}}</span></div>
                 <div class="table-responsive">
                 <table class="table table-centered table-nowrap">
                   <thead>

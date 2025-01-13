@@ -37,6 +37,7 @@ export default {
       modalDiscType:null,
       modalDisc:null,
       modalCustomer: null,
+      modalComment: null,
       orderStatuses: [],
       detailModal: false,
       date: [
@@ -87,6 +88,16 @@ export default {
         {
           value: "customer.name",
           text: "Billing Name",
+          sortable: true,
+        },
+        {
+          value: "customer.comment",
+          text: "Customer Comment",
+          sortable: true,
+        },
+        {
+          value: "managerComment",
+          text: "Manager Comment",
           sortable: true,
         },
       
@@ -154,7 +165,7 @@ export default {
       .request({
         method: "post",
         url:
-          "http://posapi.ronnyspizza.grena.ge/rest/web/index.php?r=v1/poses/order-statuses",
+          this.$hostname + "poses/order-statuses",
         headers: {
           Authorization: "Bearer " + this.TOKEN
         },
@@ -172,13 +183,13 @@ export default {
     },
     showDetail(item){
       this.modalProductId = item.id
-      this.modalDiscType  = item.order_data.discountName
-      this.modalDisc = item.order_data.discount+this.discount(item,"discname")
-      this.modalCustomer =item.order_data.customer.name
+      this.modalDiscType  = item.discountName
+      this.modalDisc = item.discount+this.discount(item,"discname")
+      this.modalCustomer =item.customer.name
+      this.modalComment =item.managerComment;
       // eslint-disable-next-line no-console
-      console.log(item.order_data.items)
-      this.order_data = item.order_data.items
-      this.modalTotalPrice = item.order_data.totalPrice
+      this.order_data = item.items
+      this.modalTotalPrice = item.totalPrice
       this.modalDiscount =  this.discount(item,"discounted")
       this.modalTotalDue = this.discount(item,"totalDue")
       this.detailModal = true
@@ -394,6 +405,7 @@ export default {
               <div>Discount Type: <span class="font-size-15 font-weight-bold text-muted">{{modalDiscType}}</span></div>
                 <div>Discount: <span class="font-size-15 font-weight-bold text-muted">{{modalDisc}}</span></div>
                 <div>Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{modalCustomer}}</span></div>
+                <div>Manager comment: <span class="font-size-15 font-weight-bold text-muted">{{modalComment}}</span></div>
                 <div class="table-responsive">
                 <table class="table table-centered table-nowrap">
                   <thead>
