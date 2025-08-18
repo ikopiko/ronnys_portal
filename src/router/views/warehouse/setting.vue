@@ -174,6 +174,7 @@ export default {
         },
         { text: "Category", value: "category_name", align: "end"},
         { text: "Product Cateogry", value: "product_category_name", align: "end" },
+        { text: "Role", value: "role", align: "end" },
         { text: "Warehouse Type", value: "warehous_type_name", align: "end" },
         { text: "Actions", value: "actions", align: "end", sortable: false },
       ],

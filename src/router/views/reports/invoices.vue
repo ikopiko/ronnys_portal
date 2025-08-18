@@ -31,6 +31,7 @@ export default {
     return {
       modalTotalPrice:null,
       modalDiscount:null,
+      modalFee:null,
       modalTotalDue:null,
       order_data:[],
       fullOrder:[],
@@ -164,6 +165,7 @@ export default {
       this.fullOrder = item  
       this.order_data = item.order_data.items
       this.modalTotalPrice = item.total_price
+      this.modalFee = item.order_data.deliveryFee
       this.modalDiscount =  this.discount(item,"discounted")
       this.modalTotalDue = this.discount(item,"totalDue")
       this.detailModal = true
@@ -361,6 +363,8 @@ export default {
               <div class="mb-1">ID #: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.id:""}}</span></div>
               <div class="mb-1">Customer Name: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.name:""}}</span></div>
               <div>Customer Phone: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.phone:""}}</span></div>
+              <div>Email: <span class="font-size-15 font-weight-bold text-muted">{{Object.keys(fullOrder).length>0?fullOrder.order_data.customer.invoice.email:""}}</span></div>
+              
               <hr>
 
                 <div class="table-responsive">
@@ -378,14 +382,25 @@ export default {
                         <div>
                           <div class="font-size-15 font-weight-bold text-muted">
                             {{ item.size }} {{ item.name }}
+                            <br />
+                            <span v-if="item.category_name == 'pizza'">
+                              <div class="font-size-15 font-weight-bold text-muted" v-for="(topping, index) in item.toppings" :key="index">
+                               {{ topping.count }} X {{ topping.name  }} - {{ topping.price }}
+                              </div>
+                              <div class="font-size-15 font-weight-bold text-muted" v-for="(def, index) in item.defaultToppings" :key="index">
+                                <span v-if="def.isDeleted">
+                                  - {{ def.name  }} - {{ def.price }}
+                                </span>
+                              </div>
+                            </span>
                           </div>
-                          <span class="text-muted font-size-14 mb-0">GEL {{ item.price }} x {{ item.qty }}</span>
+                          <span class="text-muted font-size-14 mb-0">GEL {{ item.totalPrice }} x {{ item.qty }}</span>
                         </div>
                       </td>
                       <td>
                         X {{ item.qty }}
                       </td>
-                      <td>{{ item.price * item.qty }}</td>
+                      <td>{{ (item.price * item.qty).toFixed(2) }}</td>
                     </tr>
                     <tr>
                       <td colspan="2">
@@ -398,6 +413,12 @@ export default {
                         <h6 class="m-0 text-end">Discount:</h6> 
                       </td>
                       <td class="font-size-15 font-weight-bold text-muted">{{modalDiscount}}</td>
+                    </tr>
+                    <tr v-if="fullOrder.deliveryMethod == 'delivery'">
+                      <td colspan="2">
+                        <h6 class="m-0 text-end">Delivery Fee:</h6> 
+                      </td>
+                      <td class="font-size-15 font-weight-bold text-muted">{{modalFee}}</td>
                     </tr>
                     <tr>
                       <td colspan="2">
